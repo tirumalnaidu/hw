@@ -45,63 +45,7 @@ class cdp_cov_pool extends nvdla_coverage_base;
     bit_toggle_cg    tg_cdp_lut_lo_slope_uflow_shift;
     bit_toggle_cg    tg_cdp_lut_lo_slope_oflow_shift;
 
-    function new(string name, ral_sys_top ral);
-        super.new(name, ral);
-
-        cdp_cg     = new();
-        cdp_lut_cg = new();
-
-        tg_cdp_cube_width        = new("tg_cdp_cube_width",           ral.nvdla.NVDLA_CDP_RDMA.D_DATA_CUBE_WIDTH.WIDTH.get_n_bits());
-        tg_cdp_cube_height       = new("tg_cdp_cube_height",          ral.nvdla.NVDLA_CDP_RDMA.D_DATA_CUBE_HEIGHT.HEIGHT.get_n_bits());
-        tg_cdp_cube_channel      = new("tg_cdp_cube_channel",         ral.nvdla.NVDLA_CDP_RDMA.D_DATA_CUBE_CHANNEL.CHANNEL.get_n_bits());
-        tg_cdp_src_base_addr_low = new("tg_cdp_src_base_addr_low",    ral.nvdla.NVDLA_CDP_RDMA.D_SRC_BASE_ADDR_LOW.SRC_BASE_ADDR_LOW.get_n_bits());
-`ifdef MEM_ADDR_WIDTH_GT_32
-        tg_cdp_src_base_addr_high= new("tg_cdp_src_base_addr_high",   ral.nvdla.NVDLA_CDP_RDMA.D_SRC_BASE_ADDR_HIGH.SRC_BASE_ADDR_HIGH.get_n_bits());
-`endif
-        tg_cdp_src_line_stride   = new("tg_cdp_src_line_stride",      ral.nvdla.NVDLA_CDP_RDMA.D_SRC_LINE_STRIDE.SRC_LINE_STRIDE.get_n_bits());
-        tg_cdp_src_surface_stride= new("tg_cdp_src_surface_stride",   ral.nvdla.NVDLA_CDP_RDMA.D_SRC_SURFACE_STRIDE.SRC_SURFACE_STRIDE.get_n_bits());
-        tg_cdp_dst_base_addr_low = new("tg_cdp_dst_base_addr_low",    ral.nvdla.NVDLA_CDP.D_DST_BASE_ADDR_LOW.DST_BASE_ADDR_LOW.get_n_bits());
-`ifdef MEM_ADDR_WIDTH_GT_32
-        tg_cdp_dst_base_addr_high= new("tg_cdp_dst_base_addr_high",   ral.nvdla.NVDLA_CDP.D_DST_BASE_ADDR_HIGH.DST_BASE_ADDR_HIGH.get_n_bits());
-`endif
-        tg_cdp_dst_line_stride   = new("tg_cdp_dst_line_stride",      ral.nvdla.NVDLA_CDP.D_DST_LINE_STRIDE.DST_LINE_STRIDE.get_n_bits());
-        tg_cdp_dst_surface_stride= new("tg_cdp_dst_surface_stride",   ral.nvdla.NVDLA_CDP.D_DST_SURFACE_STRIDE.DST_SURFACE_STRIDE.get_n_bits());
-
-        // cdp lut
-        tg_cdp_lut_le_index_offset      = new("tg_cdp_lut_le_index_offset",      ral.nvdla.NVDLA_CDP.S_LUT_INFO.LUT_LE_INDEX_OFFSET.get_n_bits());
-        tg_cdp_lut_le_index_select      = new("tg_cdp_lut_le_index_select",      ral.nvdla.NVDLA_CDP.S_LUT_INFO.LUT_LE_INDEX_SELECT.get_n_bits());
-        tg_cdp_lut_lo_index_select      = new("tg_cdp_lut_lo_index_select",      ral.nvdla.NVDLA_CDP.S_LUT_INFO.LUT_LO_INDEX_SELECT.get_n_bits());
-        tg_cdp_lut_le_start_low         = new("tg_cdp_lut_le_start_low",         ral.nvdla.NVDLA_CDP.S_LUT_LE_START_LOW.LUT_LE_START_LOW.get_n_bits());
-        tg_cdp_lut_le_start_high        = new("tg_cdp_lut_le_start_high",        ral.nvdla.NVDLA_CDP.S_LUT_LE_START_HIGH.LUT_LE_START_HIGH.get_n_bits());
-        tg_cdp_lut_le_end_low           = new("tg_cdp_lut_le_end_low",           ral.nvdla.NVDLA_CDP.S_LUT_LE_END_LOW.LUT_LE_END_LOW.get_n_bits());
-        tg_cdp_lut_le_end_high          = new("tg_cdp_lut_le_end_high",          ral.nvdla.NVDLA_CDP.S_LUT_LE_END_HIGH.LUT_LE_END_HIGH.get_n_bits());
-        tg_cdp_lut_lo_start_low         = new("tg_cdp_lut_lo_start_low",         ral.nvdla.NVDLA_CDP.S_LUT_LO_START_LOW.LUT_LO_START_LOW.get_n_bits());
-        tg_cdp_lut_lo_start_high        = new("tg_cdp_lut_lo_start_high",        ral.nvdla.NVDLA_CDP.S_LUT_LO_START_HIGH.LUT_LO_START_HIGH.get_n_bits());
-        tg_cdp_lut_lo_end_low           = new("tg_cdp_lut_lo_end_low",           ral.nvdla.NVDLA_CDP.S_LUT_LO_END_LOW.LUT_LO_END_LOW.get_n_bits());
-        tg_cdp_lut_lo_end_high          = new("tg_cdp_lut_lo_end_high",          ral.nvdla.NVDLA_CDP.S_LUT_LO_END_HIGH.LUT_LO_END_HIGH.get_n_bits());
-        tg_cdp_lut_le_slope_uflow_scale = new("tg_cdp_lut_le_slope_uflow_scale", ral.nvdla.NVDLA_CDP.S_LUT_LE_SLOPE_SCALE.LUT_LE_SLOPE_UFLOW_SCALE.get_n_bits());
-        tg_cdp_lut_le_slope_oflow_scale = new("tg_cdp_lut_le_slope_oflow_scale", ral.nvdla.NVDLA_CDP.S_LUT_LE_SLOPE_SCALE.LUT_LE_SLOPE_OFLOW_SCALE.get_n_bits());
-        tg_cdp_lut_le_slope_uflow_shift = new("tg_cdp_lut_le_slope_uflow_shift", ral.nvdla.NVDLA_CDP.S_LUT_LE_SLOPE_SHIFT.LUT_LE_SLOPE_UFLOW_SHIFT.get_n_bits());
-        tg_cdp_lut_le_slope_oflow_shift = new("tg_cdp_lut_le_slope_oflow_shift", ral.nvdla.NVDLA_CDP.S_LUT_LE_SLOPE_SHIFT.LUT_LE_SLOPE_OFLOW_SHIFT.get_n_bits());
-        tg_cdp_lut_lo_slope_uflow_scale = new("tg_cdp_lut_lo_slope_uflow_scale", ral.nvdla.NVDLA_CDP.S_LUT_LO_SLOPE_SCALE.LUT_LO_SLOPE_UFLOW_SCALE.get_n_bits());
-        tg_cdp_lut_lo_slope_oflow_scale = new("tg_cdp_lut_lo_slope_oflow_scale", ral.nvdla.NVDLA_CDP.S_LUT_LO_SLOPE_SCALE.LUT_LO_SLOPE_OFLOW_SCALE.get_n_bits());
-        tg_cdp_lut_lo_slope_uflow_shift = new("tg_cdp_lut_lo_slope_uflow_shift", ral.nvdla.NVDLA_CDP.S_LUT_LO_SLOPE_SHIFT.LUT_LO_SLOPE_UFLOW_SHIFT.get_n_bits());
-        tg_cdp_lut_lo_slope_oflow_shift = new("tg_cdp_lut_lo_slope_oflow_shift", ral.nvdla.NVDLA_CDP.S_LUT_LO_SLOPE_SHIFT.LUT_LO_SLOPE_OFLOW_SHIFT.get_n_bits());
-    endfunction : new
-
-    task sample();
-        `uvm_info(tID, $sformatf("Sample Begin ..."), UVM_LOW)
-        cdp_toggle_sample();    // Sample toggle coverage
-        cdp_cg.sample();        // Sample coverage group
-    endtask : sample
-
-    task cdp_lut_sample();
-        `uvm_info(tID, $sformatf("CDP LUT Sample Begin ..."), UVM_LOW)
-        cdp_lut_toggle_sample();    // Sample toggle coverage
-        cdp_lut_cg.sample();        // Sample coverage group
-    endtask : cdp_lut_sample
-
-    // Write individual coverpoint first
+       // Write individual coverpoint first
     // Divide into small covergroups later
     covergroup cdp_cg;
 
@@ -479,6 +423,63 @@ class cdp_cov_pool extends nvdla_coverage_base;
         }
 
     endgroup : cdp_lut_cg
+
+    function new(string name, ral_sys_top ral);
+        super.new(name, ral);
+
+        cdp_cg     = new();
+        cdp_lut_cg = new();
+
+        tg_cdp_cube_width        = new("tg_cdp_cube_width",           ral.nvdla.NVDLA_CDP_RDMA.D_DATA_CUBE_WIDTH.WIDTH.get_n_bits());
+        tg_cdp_cube_height       = new("tg_cdp_cube_height",          ral.nvdla.NVDLA_CDP_RDMA.D_DATA_CUBE_HEIGHT.HEIGHT.get_n_bits());
+        tg_cdp_cube_channel      = new("tg_cdp_cube_channel",         ral.nvdla.NVDLA_CDP_RDMA.D_DATA_CUBE_CHANNEL.CHANNEL.get_n_bits());
+        tg_cdp_src_base_addr_low = new("tg_cdp_src_base_addr_low",    ral.nvdla.NVDLA_CDP_RDMA.D_SRC_BASE_ADDR_LOW.SRC_BASE_ADDR_LOW.get_n_bits());
+`ifdef MEM_ADDR_WIDTH_GT_32
+        tg_cdp_src_base_addr_high= new("tg_cdp_src_base_addr_high",   ral.nvdla.NVDLA_CDP_RDMA.D_SRC_BASE_ADDR_HIGH.SRC_BASE_ADDR_HIGH.get_n_bits());
+`endif
+        tg_cdp_src_line_stride   = new("tg_cdp_src_line_stride",      ral.nvdla.NVDLA_CDP_RDMA.D_SRC_LINE_STRIDE.SRC_LINE_STRIDE.get_n_bits());
+        tg_cdp_src_surface_stride= new("tg_cdp_src_surface_stride",   ral.nvdla.NVDLA_CDP_RDMA.D_SRC_SURFACE_STRIDE.SRC_SURFACE_STRIDE.get_n_bits());
+        tg_cdp_dst_base_addr_low = new("tg_cdp_dst_base_addr_low",    ral.nvdla.NVDLA_CDP.D_DST_BASE_ADDR_LOW.DST_BASE_ADDR_LOW.get_n_bits());
+`ifdef MEM_ADDR_WIDTH_GT_32
+        tg_cdp_dst_base_addr_high= new("tg_cdp_dst_base_addr_high",   ral.nvdla.NVDLA_CDP.D_DST_BASE_ADDR_HIGH.DST_BASE_ADDR_HIGH.get_n_bits());
+`endif
+        tg_cdp_dst_line_stride   = new("tg_cdp_dst_line_stride",      ral.nvdla.NVDLA_CDP.D_DST_LINE_STRIDE.DST_LINE_STRIDE.get_n_bits());
+        tg_cdp_dst_surface_stride= new("tg_cdp_dst_surface_stride",   ral.nvdla.NVDLA_CDP.D_DST_SURFACE_STRIDE.DST_SURFACE_STRIDE.get_n_bits());
+
+        // cdp lut
+        tg_cdp_lut_le_index_offset      = new("tg_cdp_lut_le_index_offset",      ral.nvdla.NVDLA_CDP.S_LUT_INFO.LUT_LE_INDEX_OFFSET.get_n_bits());
+        tg_cdp_lut_le_index_select      = new("tg_cdp_lut_le_index_select",      ral.nvdla.NVDLA_CDP.S_LUT_INFO.LUT_LE_INDEX_SELECT.get_n_bits());
+        tg_cdp_lut_lo_index_select      = new("tg_cdp_lut_lo_index_select",      ral.nvdla.NVDLA_CDP.S_LUT_INFO.LUT_LO_INDEX_SELECT.get_n_bits());
+        tg_cdp_lut_le_start_low         = new("tg_cdp_lut_le_start_low",         ral.nvdla.NVDLA_CDP.S_LUT_LE_START_LOW.LUT_LE_START_LOW.get_n_bits());
+        tg_cdp_lut_le_start_high        = new("tg_cdp_lut_le_start_high",        ral.nvdla.NVDLA_CDP.S_LUT_LE_START_HIGH.LUT_LE_START_HIGH.get_n_bits());
+        tg_cdp_lut_le_end_low           = new("tg_cdp_lut_le_end_low",           ral.nvdla.NVDLA_CDP.S_LUT_LE_END_LOW.LUT_LE_END_LOW.get_n_bits());
+        tg_cdp_lut_le_end_high          = new("tg_cdp_lut_le_end_high",          ral.nvdla.NVDLA_CDP.S_LUT_LE_END_HIGH.LUT_LE_END_HIGH.get_n_bits());
+        tg_cdp_lut_lo_start_low         = new("tg_cdp_lut_lo_start_low",         ral.nvdla.NVDLA_CDP.S_LUT_LO_START_LOW.LUT_LO_START_LOW.get_n_bits());
+        tg_cdp_lut_lo_start_high        = new("tg_cdp_lut_lo_start_high",        ral.nvdla.NVDLA_CDP.S_LUT_LO_START_HIGH.LUT_LO_START_HIGH.get_n_bits());
+        tg_cdp_lut_lo_end_low           = new("tg_cdp_lut_lo_end_low",           ral.nvdla.NVDLA_CDP.S_LUT_LO_END_LOW.LUT_LO_END_LOW.get_n_bits());
+        tg_cdp_lut_lo_end_high          = new("tg_cdp_lut_lo_end_high",          ral.nvdla.NVDLA_CDP.S_LUT_LO_END_HIGH.LUT_LO_END_HIGH.get_n_bits());
+        tg_cdp_lut_le_slope_uflow_scale = new("tg_cdp_lut_le_slope_uflow_scale", ral.nvdla.NVDLA_CDP.S_LUT_LE_SLOPE_SCALE.LUT_LE_SLOPE_UFLOW_SCALE.get_n_bits());
+        tg_cdp_lut_le_slope_oflow_scale = new("tg_cdp_lut_le_slope_oflow_scale", ral.nvdla.NVDLA_CDP.S_LUT_LE_SLOPE_SCALE.LUT_LE_SLOPE_OFLOW_SCALE.get_n_bits());
+        tg_cdp_lut_le_slope_uflow_shift = new("tg_cdp_lut_le_slope_uflow_shift", ral.nvdla.NVDLA_CDP.S_LUT_LE_SLOPE_SHIFT.LUT_LE_SLOPE_UFLOW_SHIFT.get_n_bits());
+        tg_cdp_lut_le_slope_oflow_shift = new("tg_cdp_lut_le_slope_oflow_shift", ral.nvdla.NVDLA_CDP.S_LUT_LE_SLOPE_SHIFT.LUT_LE_SLOPE_OFLOW_SHIFT.get_n_bits());
+        tg_cdp_lut_lo_slope_uflow_scale = new("tg_cdp_lut_lo_slope_uflow_scale", ral.nvdla.NVDLA_CDP.S_LUT_LO_SLOPE_SCALE.LUT_LO_SLOPE_UFLOW_SCALE.get_n_bits());
+        tg_cdp_lut_lo_slope_oflow_scale = new("tg_cdp_lut_lo_slope_oflow_scale", ral.nvdla.NVDLA_CDP.S_LUT_LO_SLOPE_SCALE.LUT_LO_SLOPE_OFLOW_SCALE.get_n_bits());
+        tg_cdp_lut_lo_slope_uflow_shift = new("tg_cdp_lut_lo_slope_uflow_shift", ral.nvdla.NVDLA_CDP.S_LUT_LO_SLOPE_SHIFT.LUT_LO_SLOPE_UFLOW_SHIFT.get_n_bits());
+        tg_cdp_lut_lo_slope_oflow_shift = new("tg_cdp_lut_lo_slope_oflow_shift", ral.nvdla.NVDLA_CDP.S_LUT_LO_SLOPE_SHIFT.LUT_LO_SLOPE_OFLOW_SHIFT.get_n_bits());
+    endfunction : new
+
+    task sample();
+        `uvm_info(tID, $sformatf("Sample Begin ..."), UVM_LOW)
+        cdp_toggle_sample();    // Sample toggle coverage
+        cdp_cg.sample();        // Sample coverage group
+    endtask : sample
+
+    task cdp_lut_sample();
+        `uvm_info(tID, $sformatf("CDP LUT Sample Begin ..."), UVM_LOW)
+        cdp_lut_toggle_sample();    // Sample toggle coverage
+        cdp_lut_cg.sample();        // Sample coverage group
+    endtask : cdp_lut_sample
+
 
     function void cdp_toggle_sample();
         tg_cdp_cube_width.sample(ral.nvdla.NVDLA_CDP_RDMA.D_DATA_CUBE_WIDTH.WIDTH.value);

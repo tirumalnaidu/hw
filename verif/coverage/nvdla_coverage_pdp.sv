@@ -42,53 +42,7 @@ class pdp_cov_pool extends nvdla_coverage_base;
     bit_toggle_cg tg_pdp_pad_value_6x;
     bit_toggle_cg tg_pdp_pad_value_7x;
 
-    function new(string name, ral_sys_top ral);
-        super.new(name, ral);
-
-        pdp_cg = new();
-
-        tg_pdp_cube_in_width = new("tg_pdp_cube_in_width", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_IN_WIDTH.CUBE_IN_WIDTH.get_n_bits());
-        tg_pdp_cube_in_height = new("tg_pdp_cube_in_height", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_IN_HEIGHT.CUBE_IN_HEIGHT.get_n_bits());
-        tg_pdp_cube_in_channel = new("tg_pdp_cube_in_channel", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_IN_CHANNEL.CUBE_IN_CHANNEL.get_n_bits());
-        tg_pdp_src_base_addr_low = new("tg_pdp_src_base_addr_low", ral.nvdla.NVDLA_PDP.D_SRC_BASE_ADDR_LOW.SRC_BASE_ADDR_LOW.get_n_bits());
-`ifdef MEM_ADDR_WIDTH_GT_32
-        tg_pdp_src_base_addr_high = new("tg_pdp_src_base_addr_high", ral.nvdla.NVDLA_PDP.D_SRC_BASE_ADDR_HIGH.SRC_BASE_ADDR_HIGH.get_n_bits());
-`endif
-        tg_pdp_src_line_stride = new("tg_pdp_src_line_stride", ral.nvdla.NVDLA_PDP.D_SRC_LINE_STRIDE.SRC_LINE_STRIDE.get_n_bits());
-        tg_pdp_src_surface_stride = new("tg_pdp_src_surface_stride", ral.nvdla.NVDLA_PDP.D_SRC_SURFACE_STRIDE.SRC_SURFACE_STRIDE.get_n_bits());
-        tg_pdp_partial_width_in_first = new("tg_pdp_partial_width_in_first", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_IN.PARTIAL_WIDTH_IN_FIRST.get_n_bits());
-        tg_pdp_partial_width_in_last = new("tg_pdp_partial_width_in_last", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_IN.PARTIAL_WIDTH_IN_LAST.get_n_bits());
-        tg_pdp_partial_width_in_mid = new("tg_pdp_partial_width_in_mid", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_IN.PARTIAL_WIDTH_IN_MID.get_n_bits());
-        tg_pdp_cube_out_width = new("tg_pdp_cube_out_width", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_OUT_WIDTH.CUBE_OUT_WIDTH.get_n_bits());
-        tg_pdp_cube_out_height = new("tg_pdp_cube_out_height", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_OUT_HEIGHT.CUBE_OUT_HEIGHT.get_n_bits());
-        tg_pdp_cube_out_channel = new("tg_pdp_cube_out_channel", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_OUT_CHANNEL.CUBE_OUT_CHANNEL.get_n_bits());
-        tg_pdp_dst_base_addr_low = new("tg_pdp_dst_base_addr_low", ral.nvdla.NVDLA_PDP.D_DST_BASE_ADDR_LOW.DST_BASE_ADDR_LOW.get_n_bits());
-`ifdef MEM_ADDR_WIDTH_GT_32
-        tg_pdp_dst_base_addr_high = new("tg_pdp_dst_base_addr_high", ral.nvdla.NVDLA_PDP.D_DST_BASE_ADDR_HIGH.DST_BASE_ADDR_HIGH.get_n_bits());
-`endif
-        tg_pdp_dst_line_stride = new("tg_pdp_dst_line_stride", ral.nvdla.NVDLA_PDP.D_DST_LINE_STRIDE.DST_LINE_STRIDE.get_n_bits());
-        tg_pdp_dst_surface_stride = new("tg_pdp_dst_surface_stride", ral.nvdla.NVDLA_PDP.D_DST_SURFACE_STRIDE.DST_SURFACE_STRIDE.get_n_bits());
-        tg_pdp_partial_width_out_first = new("tg_pdp_partial_width_out_first", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_OUT.PARTIAL_WIDTH_OUT_FIRST.get_n_bits());
-        tg_pdp_partial_width_out_last = new("tg_pdp_partial_width_out_last", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_OUT.PARTIAL_WIDTH_OUT_LAST.get_n_bits());
-        tg_pdp_partial_width_out_mid = new("tg_pdp_partial_width_out_mid", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_OUT.PARTIAL_WIDTH_OUT_MID.get_n_bits());
-//      tg_pdp_recip_kernel_width = new("tg_pdp_recip_kernel_width", ral.nvdla.NVDLA_PDP.D_RECIP_KERNEL_WIDTH.RECIP_KERNEL_WIDTH.get_n_bits());
-//      tg_pdp_recip_kernel_height = new("tg_pdp_recip_kernel_height", ral.nvdla.NVDLA_PDP.D_RECIP_KERNEL_HEIGHT.RECIP_KERNEL_HEIGHT.get_n_bits());
-        tg_pdp_pad_value_1x = new("tg_pdp_pad_value_1x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_1_CFG.PAD_VALUE_1X.get_n_bits());
-        tg_pdp_pad_value_2x = new("tg_pdp_pad_value_2x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_2_CFG.PAD_VALUE_2X.get_n_bits());
-        tg_pdp_pad_value_3x = new("tg_pdp_pad_value_3x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_3_CFG.PAD_VALUE_3X.get_n_bits());
-        tg_pdp_pad_value_4x = new("tg_pdp_pad_value_4x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_4_CFG.PAD_VALUE_4X.get_n_bits());
-        tg_pdp_pad_value_5x = new("tg_pdp_pad_value_5x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_5_CFG.PAD_VALUE_5X.get_n_bits());
-        tg_pdp_pad_value_6x = new("tg_pdp_pad_value_6x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_6_CFG.PAD_VALUE_6X.get_n_bits());
-        tg_pdp_pad_value_7x = new("tg_pdp_pad_value_7x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_7_CFG.PAD_VALUE_7X.get_n_bits());
-    endfunction : new
-
-    task sample();
-        `uvm_info(tID, $sformatf("Sample Begin ..."), UVM_LOW)
-        pdp_toggle_sample();    // Sample toggle coverage
-        pdp_cg.sample();        // Sample coverage group
-    endtask : sample
-
-    // Write individual coverpoint first
+       // Write individual coverpoint first
     // Divide into small covergroups later
     covergroup pdp_cg;
 
@@ -357,6 +311,53 @@ class pdp_cov_pool extends nvdla_coverage_base;
             ignore_bins on_flying = binsof(cp_flying_mode.ON_FLYING);
         }
     endgroup : pdp_cg
+
+    function new(string name, ral_sys_top ral);
+        super.new(name, ral);
+
+        pdp_cg = new();
+
+        tg_pdp_cube_in_width = new("tg_pdp_cube_in_width", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_IN_WIDTH.CUBE_IN_WIDTH.get_n_bits());
+        tg_pdp_cube_in_height = new("tg_pdp_cube_in_height", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_IN_HEIGHT.CUBE_IN_HEIGHT.get_n_bits());
+        tg_pdp_cube_in_channel = new("tg_pdp_cube_in_channel", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_IN_CHANNEL.CUBE_IN_CHANNEL.get_n_bits());
+        tg_pdp_src_base_addr_low = new("tg_pdp_src_base_addr_low", ral.nvdla.NVDLA_PDP.D_SRC_BASE_ADDR_LOW.SRC_BASE_ADDR_LOW.get_n_bits());
+`ifdef MEM_ADDR_WIDTH_GT_32
+        tg_pdp_src_base_addr_high = new("tg_pdp_src_base_addr_high", ral.nvdla.NVDLA_PDP.D_SRC_BASE_ADDR_HIGH.SRC_BASE_ADDR_HIGH.get_n_bits());
+`endif
+        tg_pdp_src_line_stride = new("tg_pdp_src_line_stride", ral.nvdla.NVDLA_PDP.D_SRC_LINE_STRIDE.SRC_LINE_STRIDE.get_n_bits());
+        tg_pdp_src_surface_stride = new("tg_pdp_src_surface_stride", ral.nvdla.NVDLA_PDP.D_SRC_SURFACE_STRIDE.SRC_SURFACE_STRIDE.get_n_bits());
+        tg_pdp_partial_width_in_first = new("tg_pdp_partial_width_in_first", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_IN.PARTIAL_WIDTH_IN_FIRST.get_n_bits());
+        tg_pdp_partial_width_in_last = new("tg_pdp_partial_width_in_last", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_IN.PARTIAL_WIDTH_IN_LAST.get_n_bits());
+        tg_pdp_partial_width_in_mid = new("tg_pdp_partial_width_in_mid", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_IN.PARTIAL_WIDTH_IN_MID.get_n_bits());
+        tg_pdp_cube_out_width = new("tg_pdp_cube_out_width", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_OUT_WIDTH.CUBE_OUT_WIDTH.get_n_bits());
+        tg_pdp_cube_out_height = new("tg_pdp_cube_out_height", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_OUT_HEIGHT.CUBE_OUT_HEIGHT.get_n_bits());
+        tg_pdp_cube_out_channel = new("tg_pdp_cube_out_channel", ral.nvdla.NVDLA_PDP.D_DATA_CUBE_OUT_CHANNEL.CUBE_OUT_CHANNEL.get_n_bits());
+        tg_pdp_dst_base_addr_low = new("tg_pdp_dst_base_addr_low", ral.nvdla.NVDLA_PDP.D_DST_BASE_ADDR_LOW.DST_BASE_ADDR_LOW.get_n_bits());
+`ifdef MEM_ADDR_WIDTH_GT_32
+        tg_pdp_dst_base_addr_high = new("tg_pdp_dst_base_addr_high", ral.nvdla.NVDLA_PDP.D_DST_BASE_ADDR_HIGH.DST_BASE_ADDR_HIGH.get_n_bits());
+`endif
+        tg_pdp_dst_line_stride = new("tg_pdp_dst_line_stride", ral.nvdla.NVDLA_PDP.D_DST_LINE_STRIDE.DST_LINE_STRIDE.get_n_bits());
+        tg_pdp_dst_surface_stride = new("tg_pdp_dst_surface_stride", ral.nvdla.NVDLA_PDP.D_DST_SURFACE_STRIDE.DST_SURFACE_STRIDE.get_n_bits());
+        tg_pdp_partial_width_out_first = new("tg_pdp_partial_width_out_first", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_OUT.PARTIAL_WIDTH_OUT_FIRST.get_n_bits());
+        tg_pdp_partial_width_out_last = new("tg_pdp_partial_width_out_last", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_OUT.PARTIAL_WIDTH_OUT_LAST.get_n_bits());
+        tg_pdp_partial_width_out_mid = new("tg_pdp_partial_width_out_mid", ral.nvdla.NVDLA_PDP.D_PARTIAL_WIDTH_OUT.PARTIAL_WIDTH_OUT_MID.get_n_bits());
+//      tg_pdp_recip_kernel_width = new("tg_pdp_recip_kernel_width", ral.nvdla.NVDLA_PDP.D_RECIP_KERNEL_WIDTH.RECIP_KERNEL_WIDTH.get_n_bits());
+//      tg_pdp_recip_kernel_height = new("tg_pdp_recip_kernel_height", ral.nvdla.NVDLA_PDP.D_RECIP_KERNEL_HEIGHT.RECIP_KERNEL_HEIGHT.get_n_bits());
+        tg_pdp_pad_value_1x = new("tg_pdp_pad_value_1x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_1_CFG.PAD_VALUE_1X.get_n_bits());
+        tg_pdp_pad_value_2x = new("tg_pdp_pad_value_2x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_2_CFG.PAD_VALUE_2X.get_n_bits());
+        tg_pdp_pad_value_3x = new("tg_pdp_pad_value_3x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_3_CFG.PAD_VALUE_3X.get_n_bits());
+        tg_pdp_pad_value_4x = new("tg_pdp_pad_value_4x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_4_CFG.PAD_VALUE_4X.get_n_bits());
+        tg_pdp_pad_value_5x = new("tg_pdp_pad_value_5x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_5_CFG.PAD_VALUE_5X.get_n_bits());
+        tg_pdp_pad_value_6x = new("tg_pdp_pad_value_6x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_6_CFG.PAD_VALUE_6X.get_n_bits());
+        tg_pdp_pad_value_7x = new("tg_pdp_pad_value_7x", ral.nvdla.NVDLA_PDP.D_POOLING_PADDING_VALUE_7_CFG.PAD_VALUE_7X.get_n_bits());
+    endfunction : new
+
+    task sample();
+        `uvm_info(tID, $sformatf("Sample Begin ..."), UVM_LOW)
+        pdp_toggle_sample();    // Sample toggle coverage
+        pdp_cg.sample();        // Sample coverage group
+    endtask : sample
+
 
     function void pdp_toggle_sample();
         tg_pdp_cube_in_width.sample(ral.nvdla.NVDLA_PDP.D_DATA_CUBE_IN_WIDTH.CUBE_IN_WIDTH.value);

@@ -117,7 +117,7 @@ function nvdla_rbk_resource::new(string name="nvdla_rbk_resource", uvm_component
 endfunction: new
 
 function void nvdla_rbk_resource::trace_dump(int fh);
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

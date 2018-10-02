@@ -17,7 +17,7 @@
 /// not legal as per the ANSI C++ standard.
 /// See SolvNet Article - https://solvnet.synopsys.com/retrieve/038729.html
 ///
-#ifndef __EDG__
+#if (!defined(__EDG__) || defined(MTI_SYSTEMC))
 #include "uvmc.h"
 using namespace uvmc;
 #endif

@@ -83,9 +83,10 @@ class dbb_slave_agent#(int MEM_DATA_WIDTH=512) extends uvm_agent;
     dbb_monitor#(MEM_DATA_WIDTH)       slv_mon;        ///< nvdla DBB Monitor
 
 
-    typedef virtual dbb_interface#(MEM_DATA_WIDTH) vif;
-    vif slv_if;                     ///< DBB Virtual interface.
-
+    //typedef virtual dbb_interface#(MEM_DATA_WIDTH) vif;
+    //vif slv_if;                     ///< DBB Virtual interface.
+    virtual 				dbb_interface#(MEM_DATA_WIDTH) slv_if;
+   
     //---------------------------- CONFIGURATION PARAMETERS --------------------------------
     /// @name Configuration Parameters
     /// @{
@@ -136,12 +137,12 @@ class dbb_slave_agent#(int MEM_DATA_WIDTH=512) extends uvm_agent;
         uvm_config_int::get(this,"","disable_dbb_assertions",disable_dbb_assertions);
 
         // Check to make sure we have an virtual interface specified for the agent.
-        if (!uvm_config_db#(vif)::get(this, "", "slv_if", slv_if)) begin
+        if (!uvm_config_db#(virtual dbb_interface#(MEM_DATA_WIDTH)/*vif*/)::get(this, "", "slv_if", slv_if)) begin
             `uvm_fatal("NVDLA/DBB/SLV/AGENT/NOVIF", "No virtual interface specified for this agent instance")
         end
         else begin
             // Configure driver and monitor to use the agent interface
-            uvm_config_db#(vif)::set(this,"slv_mon","mon_if",slv_if);
+            uvm_config_db#(virtual dbb_interface#(MEM_DATA_WIDTH)/*vif*/)::set(this,"slv_mon","mon_if",slv_if);
         end
 
         // Enable assertions according to the agent configuration.
@@ -156,7 +157,7 @@ class dbb_slave_agent#(int MEM_DATA_WIDTH=512) extends uvm_agent;
 
         if (is_active == UVM_ACTIVE) begin
             uvm_config_int::set(this,"slv_drv","data_bus_width",data_bus_width);
-            uvm_config_db#(vif)::set(this,"slv_drv","drv_if",slv_if);
+            uvm_config_db#(virtual dbb_interface#(MEM_DATA_WIDTH)/*vif*/)::set(this,"slv_drv","drv_if",slv_if);
             slv_sqr = dbb_slave_seq::type_id::create("slv_sqr", this);
             slv_drv = dbb_slave_driver#(MEM_DATA_WIDTH)::type_id::create("slv_drv", this);
 
@@ -193,7 +194,7 @@ class dbb_slave_agent#(int MEM_DATA_WIDTH=512) extends uvm_agent;
 
 ///Creates the dbb bus object
     virtual function dbb_bus_object create_generic_object(string name);
-           create_generic_object= dbb_bus_object#()::type_id::create(name, this);
+           create_generic_object= dbb_bus_object::type_id::create(name, this);
 	   endfunction: create_generic_object
 
 

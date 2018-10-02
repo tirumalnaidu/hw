@@ -429,7 +429,7 @@ function nvdla_cdma_resource::new(string name="nvdla_cdma_resource", uvm_compone
     `uvm_info(inst_name, $sformatf("Initialize resource %s ... ",inst_name),UVM_LOW);
 endfunction: new
 
-static function  nvdla_cdma_resource nvdla_cdma_resource::get_cdma(uvm_component parent);
+function  nvdla_cdma_resource nvdla_cdma_resource::get_cdma(uvm_component parent);
     if (null == inst) begin
         inst = new("NVDLA_CDMA", parent);
     end
@@ -437,7 +437,7 @@ static function  nvdla_cdma_resource nvdla_cdma_resource::get_cdma(uvm_component
 endfunction: get_cdma
 
 function void nvdla_cdma_resource::trace_dump(int fh);
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

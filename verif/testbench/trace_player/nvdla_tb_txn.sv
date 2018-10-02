@@ -1,6 +1,13 @@
 `ifndef __NVDLA_TB_TXN_SV__
 `define __NVDLA_TB_TXN_SV__
 
+import uvm_pkg::*;
+
+`include "uvm_macros.svh"
+
+// All type definitions moved to nvdla_tb_types.svh
+
+/*
 typedef byte unsigned       uint8_t;
 typedef byte                int8_t;
 typedef shortint unsigned   uint16_t;
@@ -34,6 +41,8 @@ typedef enum { PRIMARY_MEM      = 0,
 typedef uvm_enum_wrapper#(kind_e)           kind_wrapper;
 typedef uvm_enum_wrapper#(memory_type_e)    memory_type_wrapper;
 
+
+*/
 // Class: sequence command
 //  usage: trace parser to sequence
 //---------------------------------------------------------------------------------------------
@@ -88,6 +97,10 @@ class interrupt_command extends uvm_sequence_item;
     endfunction
 endclass: interrupt_command
 
+
+// result_checker_command moved to mem_pkg (mem_command.sv) where it is needed and used. 
+
+/*
 // Class: result checker command
 //  usage: trace parser to result checker
 //  usage: result checker to memory model
@@ -118,7 +131,11 @@ class result_checker_command extends uvm_sequence_item;
         super.new(name);
     endfunction
 endclass: result_checker_command
+*/
 
+// memory_model_command moved to mem_pkg (mem_command.sv) where it is needed and used.
+
+/*
 // Class: memory model command
 //  usage: trace parser to memory model
 //--------------------------------------------------
@@ -149,6 +166,6 @@ class memory_model_command extends uvm_sequence_item;
         super.new(name);
     endfunction
 endclass: memory_model_command
-
+*/
 
 `endif // __NVDLA_TB_TXN_SV__

@@ -23,32 +23,6 @@ class rubik_cov_pool extends nvdla_coverage_base;
     int daout_surf_stride_diff;
     int daout_planar_stride_diff;
 
-    function new(string name, ral_sys_top ral);
-        super.new(name, ral);
-
-        rubik_cg = new();
-
-        datain_width_tog_cg  = new("datain_width_tog_cg", ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_0.DATAIN_WIDTH.get_n_bits());
-        datain_height_tog_cg  = new("datain_height_tog_cg", ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_0.DATAIN_HEIGHT.get_n_bits());
-        datain_channel_tog_cg  = new("datain_channel_tog_cg", ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_1.DATAIN_CHANNEL.get_n_bits());
-        dataout_channel_tog_cg  = new("dataout_channel_tog_cg", ral.nvdla.NVDLA_RBK.D_DATAOUT_SIZE_1.DATAOUT_CHANNEL.get_n_bits());
-        contract_stride_0_tog_cg = new("contract_stride_0_tog_cg", ral.nvdla.NVDLA_RBK.D_CONTRACT_STRIDE_0.CONTRACT_STRIDE_0.get_n_bits());
-        contract_stride_1_tog_cg = new("contract_stride_1_tog_cg", ral.nvdla.NVDLA_RBK.D_CONTRACT_STRIDE_1.CONTRACT_STRIDE_1.get_n_bits());
-    endfunction: new
-
-    function void rubik_toggle_sampel();
-        datain_width_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_0.DATAIN_WIDTH.value);
-        datain_height_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_0.DATAIN_HEIGHT.value);
-        datain_channel_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_1.DATAIN_CHANNEL.value);
-
-        dataout_channel_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_DATAOUT_SIZE_1.DATAOUT_CHANNEL.value);
-
-        if (rubik_mode_CONTRACT == ral.nvdla.NVDLA_RBK.D_MISC_CFG.RUBIK_MODE.value) begin
-            contract_stride_0_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_CONTRACT_STRIDE_0.CONTRACT_STRIDE_0.value);
-            contract_stride_1_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_CONTRACT_STRIDE_1.CONTRACT_STRIDE_1.value);
-        end
-    endfunction: rubik_toggle_sampel
-
     covergroup rubik_cg;
         cp_rubik_mode: coverpoint ral.nvdla.NVDLA_RBK.D_MISC_CFG.RUBIK_MODE.value {
             bins mode[] = {rubik_mode_CONTRACT, rubik_mode_SPLIT, rubik_mode_MERGE};
@@ -151,6 +125,33 @@ class rubik_cov_pool extends nvdla_coverage_base;
             bins full[8]   = {['h0   :'h1FFF]};
         }
     endgroup: rubik_cg;
+
+    function new(string name, ral_sys_top ral);
+        super.new(name, ral);
+
+        rubik_cg = new();
+
+        datain_width_tog_cg  = new("datain_width_tog_cg", ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_0.DATAIN_WIDTH.get_n_bits());
+        datain_height_tog_cg  = new("datain_height_tog_cg", ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_0.DATAIN_HEIGHT.get_n_bits());
+        datain_channel_tog_cg  = new("datain_channel_tog_cg", ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_1.DATAIN_CHANNEL.get_n_bits());
+        dataout_channel_tog_cg  = new("dataout_channel_tog_cg", ral.nvdla.NVDLA_RBK.D_DATAOUT_SIZE_1.DATAOUT_CHANNEL.get_n_bits());
+        contract_stride_0_tog_cg = new("contract_stride_0_tog_cg", ral.nvdla.NVDLA_RBK.D_CONTRACT_STRIDE_0.CONTRACT_STRIDE_0.get_n_bits());
+        contract_stride_1_tog_cg = new("contract_stride_1_tog_cg", ral.nvdla.NVDLA_RBK.D_CONTRACT_STRIDE_1.CONTRACT_STRIDE_1.get_n_bits());
+    endfunction: new
+
+    function void rubik_toggle_sampel();
+        datain_width_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_0.DATAIN_WIDTH.value);
+        datain_height_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_0.DATAIN_HEIGHT.value);
+        datain_channel_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_DATAIN_SIZE_1.DATAIN_CHANNEL.value);
+
+        dataout_channel_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_DATAOUT_SIZE_1.DATAOUT_CHANNEL.value);
+
+        if (rubik_mode_CONTRACT == ral.nvdla.NVDLA_RBK.D_MISC_CFG.RUBIK_MODE.value) begin
+            contract_stride_0_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_CONTRACT_STRIDE_0.CONTRACT_STRIDE_0.value);
+            contract_stride_1_tog_cg.sample(ral.nvdla.NVDLA_RBK.D_CONTRACT_STRIDE_1.CONTRACT_STRIDE_1.value);
+        end
+    endfunction: rubik_toggle_sampel
+
 
     task sample();
         `uvm_info(tID, $sformatf("Sample RUBIK Begin ..."), UVM_LOW)

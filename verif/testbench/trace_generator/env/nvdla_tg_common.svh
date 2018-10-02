@@ -7,6 +7,9 @@
 
 
 import uvm_pkg::*;
+`include "uvm_macros.svh"
+
+`include "project.vh"
 
 typedef enum { SCE_CC_SDP
               ,SCE_PDPRDMA_PDP

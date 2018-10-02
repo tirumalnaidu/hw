@@ -9,11 +9,15 @@
 //-------------------------------------------------------------------------------------
 package nvdla_scenario_pkg;
     import uvm_pkg::*;
+   `include "uvm_macros.svh"
     import surface_generator_pkg::*;
     import nvdla_resource_pkg::*;
     import mem_man_pkg::*;
     import nvdla_coverage_pkg::*;
 
+    `include "project.vh"
+    `include "nvdla_resource_define.sv" // Only for `NEVER_BE_ACTIVE
+   
     `include "nvdla_base_scenario.sv"
     `include "nvdla_pdprdma_pdp_scenario.sv"
     `include "nvdla_cdprdma_cdp_scenario.sv"

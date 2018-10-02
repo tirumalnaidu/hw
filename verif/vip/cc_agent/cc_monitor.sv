@@ -1,8 +1,10 @@
 `ifndef _CC_MONITOR_SV_
 `define _CC_MONITOR_SV_
 
+/*
 typedef class cc_monitor;
 typedef class cc_txn; 
+*/
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -13,14 +15,14 @@ typedef class cc_txn;
 //////////////////////////////////////////////////////////////////////
 
 /// Callback class for the cc_monitor.
-class cc_monitor_callbacks extends uvm_callback;
+class cc_monitor_callbacks#(int DW = 1, int MW = 1) extends uvm_callback;
 
     /// nv_HINT :: Called before a transaction is executed
-    virtual task pre_trans(cc_monitor xactor, cc_txn#() tr);
+    virtual task pre_trans(/*cc_monitor#() xactor,*/ cc_txn#(DW,MW) tr); // transactor not needed in callback definition, matching is done at registration time.
     endtask: pre_trans
     
     /// nv_HINT :: Called after a transaction has been executed
-    virtual task post_trans(cc_monitor xactor, cc_txn#() tr);
+    virtual task post_trans(/*cc_monitor#() xactor,*/ cc_txn#(DW,MW) tr);
     endtask: post_trans
 
     function new(string name = "cc_monitor_callbacks");
@@ -29,7 +31,9 @@ class cc_monitor_callbacks extends uvm_callback;
     
 endclass:cc_monitor_callbacks
 
+/*
 typedef uvm_callbacks #(cc_monitor, cc_monitor_callbacks) cc_mon_cb;
+*/
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -68,9 +72,11 @@ class cc_monitor #(int DW = 1, int MW = 1) extends uvm_monitor;
         `uvm_field_int(is_csc2cmac_dat, UVM_ALL_ON)
         `uvm_field_int(is_csc2cmac_wt,  UVM_ALL_ON)
     `uvm_component_utils_end
-
+   
+   typedef cc_monitor_callbacks#(DW,MW) cc_mon_cb;
+   
     /// Register UVM callback class
-    `uvm_register_cb(cc_monitor,cc_monitor_callbacks)
+    `uvm_register_cb(cc_monitor#(DW,MW), cc_mon_cb)
 
     //////////////////////////////////////////////////////////////////////
     /// Creates new cc_monitor object.
@@ -335,5 +341,5 @@ task cc_monitor::transaction_finished(cc_txn#(DW,MW) tr);
     mon_analysis_port.write(tr);
 
 endtask
-    
+
 `endif // _CC_MONITOR_SV_

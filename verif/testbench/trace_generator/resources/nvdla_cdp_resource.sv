@@ -355,7 +355,7 @@ function void nvdla_cdp_resource::lut_config_dump(int fh);
 endfunction : lut_config_dump
 
 function void nvdla_cdp_resource::trace_dump(int fh);
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

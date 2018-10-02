@@ -23,8 +23,12 @@ NV_PYTHON 	?= /home/tools/continuum/Anaconda3-5.0.1/bin/python
 NV_VERDI_HOME ?= /home/tools/debussy/verdi3_2016.06-SP2-9
 NV_NOVAS_HOME ?= /home/tools/debussy/verdi3_2016.06-SP2-9
 NV_VCS_HOME   ?= /home/tools/vcs/mx-2016.06-SP2-4
+NV_MTI_HOME   ?= /tools/model/qs10.4b/questasim
+NV_IUS_HOME   ?= /tools/cadence/stable-names/xcelium/2016-11
+NV_UVM_HOME   ?= /tools/model/qs10.4b/questasim/verilog_src/uvm-1.2
 NV_VERILATOR  ?= verilator
 NV_CLANG      ?= /home/utils/llvm-4.0.1/bin/clang
+NV_SIM_PLATFORM ?= vcs
 
 VM_USE_DESIGNWARE ?= 1
 VM_DESIGNWARE_DIR ?= /home/tools/synopsys/syn_2011.09/dw/sim_ver
@@ -39,8 +43,12 @@ VM_PYTHON	?= /home/tools/continuum/Anaconda3-5.0.1/bin/python
 VM_VERDI_HOME ?= /home/tools/debussy/verdi3_2016.06-SP2-9
 VM_NOVAS_HOME ?= /home/tools/debussy/verdi3_2016.06-SP2-9
 VM_VCS_HOME   ?= /home/tools/vcs/mx-2016.06-SP2-4
+VM_MTI_HOME   ?= /tools/model/qs10.4b/questasim
+VM_IUS_HOME   ?= /tools/cadence/stable-names/xcelium/2016-11
+VM_UVM_HOME   ?= /tools/model/qs10.4b/questasim/verilog_src/uvm-1.2
 VM_VERILATOR  ?= verilator
 VM_CLANG      ?= /home/utils/llvm-4.0.1/bin/clang
+VM_SIM_PLATFORM ?= vcs
 
 default: $(TREE_MAKE)
 $(TREE_MAKE): Makefile
@@ -72,6 +80,8 @@ endif
 	@echo "##======================= 										  " >> $@ 	
 	@echo "  																  " >> $@ 	
 ifeq (1,$(USE_NV_ENV))
+	@echo "## Define simulation platform: cds, mti, or vcs (default) for Cadence, ModelTech/Mentor, Synopsys, respectively		  " >> $@ 	
+	@echo "SIM_PLATFORM        := $(NV_SIM_PLATFORM)" 		>> $@
 	@echo "USE_DESIGNWARE      := $(NV_USE_DESIGNWARE)" 		>> $@
 	@echo "DESIGNWARE_DIR      := $(NV_DESIGNWARE_DIR)" 		>> $@
 	@echo "CPP      := $(NV_CPP)" 		>> $@
@@ -84,10 +94,15 @@ ifeq (1,$(USE_NV_ENV))
 	@echo "VERDI_HOME := $(NV_VERDI_HOME)" >> $@
 	@echo "NOVAS_HOME := $(NV_NOVAS_HOME)" >> $@
 	@echo "VCS_HOME   := $(NV_VCS_HOME)"   >> $@
+	@echo "MTI_HOME   := $(NV_MTI_HOME)"   >> $@
+	@echo "IUS_HOME   := $(NV_IUS_HOME)"   >> $@
+	@echo "UVM_HOME   := $(NV_UVM_HOME)"   >> $@
 	@echo "CLANG      := $(NV_CLANG)"      >> $@
 	@echo "VERILATOR  := $(NV_VERILATOR)"  >> $@
 else 
 ifeq (1,$(USE_VM_ENV))
+	@echo "## Define simulation platform: cds, mti, or vcs (default) for Cadence, ModelTech/Mentor, Synopsys, respectively		  " >> $@ 	
+	@echo "SIM_PLATFORM        := $(VM_SIM_PLATFORM)" 		>> $@
 	@echo "USE_DESIGNWARE      := $(VM_USE_DESIGNWARE)" 		>> $@
 	@echo "DESIGNWARE_DIR      := $(VM_DESIGNWARE_DIR)" 		>> $@
 	@echo "CPP      := $(VM_CPP)" 		>> $@
@@ -100,9 +115,13 @@ ifeq (1,$(USE_VM_ENV))
 	@echo "VERDI_HOME := $(VM_VERDI_HOME)" >> $@
 	@echo "NOVAS_HOME := $(VM_NOVAS_HOME)" >> $@
 	@echo "VCS_HOME   := $(VM_VCS_HOME)"   >> $@
+	@echo "MTI_HOME   := $(VM_MTI_HOME)"   >> $@
+	@echo "IUS_HOME   := $(VM_IUS_HOME)"   >> $@
+	@echo "UVM_HOME   := $(VM_UVM_HOME)"   >> $@
 	@echo "CLANG      := $(VM_CLANG)"      >> $@
 	@echo "VERILATOR  := $(VM_VERILATOR)"  >> $@
 else
+	@read -p "Simulator to use [cds, mti, or vcs (default) for Cadence, ModelTech/Mentor, Synopsys, respectively, for verilator, please use vcs (default)] (Press ENTER if use: $(NV_SIM_PLATFORM)):" opt; if [ "_$$opt" = "_" ]; then echo "USE_SIM_PLATFORM  := $(NV_SIM_PLATFORM)" >> $@;  else echo "SIM_PLATFORM  := $$opt" >> $@; fi
 	@read -p "Using designware or not [1 for use/0 for not use] (Press ENTER if use: $(NV_USE_DESIGNWARE)):" opt; if [ "_$$opt" = "_" ]; then echo "USE_DESIGNWARE  := $(NV_USE_DESIGNWARE)" >> $@;  else echo "USE_DESIGNWARE  := $$opt" >> $@; fi
 	@read -p "Enter design ware path (Press ENTER if use: $(NV_DESIGNWARE_DIR)):" opt; if [ "_$$opt" = "_" ]; then echo "DESIGNWARE_DIR  := $(NV_DESIGNWARE_DIR)" >> $@;  else echo "DESIGNWARE_DIR  := $$opt" >> $@; fi
 	@read -p "Enter c pre-processor path (Press ENTER if use: $(NV_CPP)):" opt; if [ "_$$opt" = "_" ]; then echo "CPP  := $(NV_CPP)" >> $@;  else echo "CPP  := $$opt" >> $@; fi
@@ -113,6 +132,9 @@ else
 	@read -p "Enter systemc path         (Press ENTER if use: $(NV_SYSTEMC)):" opt; if [ "_$$opt" = "_" ]; then echo "SYSTEMC := $(NV_SYSTEMC)" >> $@;  else echo "SYSTEMC := $$opt" >> $@; fi
 	@read -p "Enter python path          (Press ENTER if use: $(NV_PYTHON)):" opt; if [ "_$$opt" = "_" ]; then echo "PYTHON := $(NV_PYTHON)" >> $@;  else echo "PYTHON := $$opt" >> $@; fi
 	@read -p "Enter vcs_home path        (Press ENTER if use: $(NV_VCS_HOME)):" opt; if [ "_$$opt" = "_" ]; then echo "VCS_HOME := $(NV_VCS_HOME)" >> $@;  else echo "VCS_HOME := $$opt" >> $@; fi
+	@read -p "Enter mti_home path        (Press ENTER if use: $(NV_MTI_HOME)):" opt; if [ "_$$opt" = "_" ]; then echo "MTI_HOME := $(NV_MTI_HOME)" >> $@;  else echo "MTI_HOME := $$opt" >> $@; fi
+	@read -p "Enter ius_home path        (Press ENTER if use: $(NV_IUS_HOME)):" opt; if [ "_$$opt" = "_" ]; then echo "IUS_HOME := $(NV_IUS_HOME)" >> $@;  else echo "IUS_HOME := $$opt" >> $@; fi
+	@read -p "Enter uvm_home path        (Press ENTER if use: $(NV_UVM_HOME)):" opt; if [ "_$$opt" = "_" ]; then echo "UVM_HOME := $(NV_UVM_HOME)" >> $@;  else echo "UVM_HOME := $$opt" >> $@; fi
 	@read -p "Enter novas_home path      (Press ENTER if use: $(NV_NOVAS_HOME)):" opt; if [ "_$$opt" = "_" ]; then echo "NOVAS_HOME := $(NV_NOVAS_HOME)" >> $@;  else echo "NOVAS_HOME := $$opt" >> $@; fi
 	@read -p "Enter verdi_home path      (Press ENTER if use: $(NV_VERDI_HOME)):" opt; if [ "_$$opt" = "_" ]; then echo "VERDI_HOME := $(NV_VERDI_HOME)" >> $@;  else echo "VERDI_HOME := $$opt" >> $@; fi
 	@read -p "OPTIONAL: Enter verilator path (Press ENTER to use: $(NV_VERILATOR)):" opt_verilator; if [ "_$$opt_verilator" = "_" ]; then echo "VERILATOR := $(NV_VERILATOR)" >> $@;  else echo "VERILATOR := $$opt_verilator" >> $@; fi

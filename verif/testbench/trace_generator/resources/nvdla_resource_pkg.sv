@@ -10,6 +10,10 @@
 
 package nvdla_resource_pkg;
     import uvm_pkg::*;
+`include "uvm_macros.svh"
+
+   `include "project.vh"
+   
     import surface_generator_pkg::*;
     import mem_man_pkg::*;
     import nvdla_ral_pkg::*;

@@ -3,7 +3,8 @@
 package cc_pkg;
 
     import uvm_pkg::*;
-
+    `include "uvm_macros.svh"
+   
     `include "cc_defines.sv"
        
     // Transaction objects 

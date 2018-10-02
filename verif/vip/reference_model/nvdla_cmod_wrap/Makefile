@@ -1,10 +1,21 @@
 override DEPTH = ../../../..
 -include ${DEPTH}/tree.make
 -include ${DEPTH}/tools/make/common.make
+ifeq ($(SIM_PLATFORM),vcs)
 override SYSTEMC_INC_DIR   = $(VCS_HOME)/include/systemc23
 override SYSTEMC_LIB_DIR   = $(VCS_HOME)/linux64/lib
 override SYSTEMC_LIBRARIES = libsystemc23-gcc472-64.a
+endif
+ifeq ($(SIM_PLATFORM),mti)
+override SYSTEMC_INC_DIR   = $(MTI_HOME)/include/systemc
+override SYSTEMC_LIB_DIR   = $(MTI_HOME)/linux_x86_64 /usr/lib/x86_64-linux-gnu
+override SYSTEMC_LIBRARIES = libsystemc_gcc47.a
+endif
 include ../../../../cmod/Makefile
+ifeq ($(SIM_PLATFORM),mti)
+LD_FLAGS := -Wl,--no-whole-archive -lsystemc_gcc47 -L/tools/model/qs10.4b/questasim/linux_x86_64/
+endif
+
 UVMCONNECT_HOME  := ${TOT}/third_party_tools/uvmc-2.3.0
 
 
@@ -12,11 +23,22 @@ INTER_MON = ${DEPTH}/verif/vip/reference_model/rm_nvdla_internal_monitor/NvdlaCo
 
 DEPS += $(BUILD_DIR)/../rm_nvdla_internal_monitor/NvdlaCoreInternalMonitor.d
 
+ifeq ($(SIM_PLATFORM),vcs)
 INC_DIRS_REF := ${VCS_HOME}/include \
                 ${UVMCONNECT_HOME}/src/connect/sc \
 			    ${DEPTH}/cmod/nvdla_payload/ \
 			    ${DEPTH}/verif/vip/reference_model/nvdla_scsv/sc \
 			    $(SRC_DIR)/../verif/vip/reference_model/rm_nvdla_internal_monitor 
+endif
+
+ifeq ($(SIM_PLATFORM),mti)
+INC_DIRS_REF := ${MTI_HOME}/include \
+		${UVMCONNECT_HOME}/src/connect/sc \
+			${DEPTH}/cmod/nvdla_payload/ \
+			${DEPTH}/verif/vip/reference_model/nvdla_scsv/sc \
+			$(SRC_DIR)/../verif/vip/reference_model/rm_nvdla_internal_monitor
+endif
+
 
 INC_FLAGS_REF := $(addprefix -I,$(INC_DIRS_REF))
 CPPFLAGS += $(INC_FLAGS_REF)

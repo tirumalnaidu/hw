@@ -396,7 +396,7 @@ function nvdla_sdp_resource::new(string name="nvdla_sdp_resource", uvm_component
     `uvm_info(inst_name, $sformatf("Initialize resource %s ... \n",inst_name),UVM_LOW);
 endfunction: new
 
-static function  nvdla_sdp_resource nvdla_sdp_resource::get_sdp(uvm_component parent);
+function  nvdla_sdp_resource nvdla_sdp_resource::get_sdp(uvm_component parent);
     if (null == inst) begin
         inst = nvdla_sdp_resource::type_id::create("NVDLA_SDP", parent);
     end
@@ -405,7 +405,7 @@ endfunction: get_sdp
 
 function void nvdla_sdp_resource::trace_dump(int fh);
     // FIXME need to handle lut config dump
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

@@ -9,6 +9,7 @@
 //-------------------------------------------------------------------------------------
 package surface_generator_pkg;
     import uvm_pkg::*;
+   `include "uvm_macros.svh"
 
     typedef enum { INT8=0, INT16=1, FLOAT16=2 } precision_e;
 

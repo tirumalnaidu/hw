@@ -308,15 +308,21 @@ task nvdla_tb_intr_handler::intr_process();
         if(intr_val[lsb] == 1) begin
             string    fld_name = flds[i].get_name();
             string    blk_name = fld_name.substr(0, fld_name.len()-14);
-            bit       act_id   = fld_name.substr(fld_name.len-2, fld_name.len-1);
-            bit       exp_id;
+            int       act_id;
+            int       exp_id;
+            string    tmp_s;
+
+            tmp_s = fld_name.substr(fld_name.len-2, fld_name.len-1);
+            act_id = tmp_s.atoi();
+
             `uvm_info(tID, $sformatf("field: %0s intr_val == 1", fld_name), UVM_NONE)
 
             item = blk_cmd[blk_name].pop_front();
             if(item == null) begin
                 `uvm_fatal(tID, $sformatf("No expected INTR from %0s", fld_name))
             end
-            exp_id = item.interrupt_id.substr(item.interrupt_id.len-2, item.interrupt_id.len-1);
+            tmp_s = item.interrupt_id.substr(item.interrupt_id.len-2, item.interrupt_id.len-1);
+            exp_id = tmp_s.atoi();
             if(exp_id != act_id) begin
                 interrupt_command item_pre;
                 `uvm_warning(tID, $sformatf("Group of INTR mismatch, exp:%0d, act:%0d, checking next exp INTR ID", exp_id, act_id))
@@ -325,7 +331,8 @@ task nvdla_tb_intr_handler::intr_process();
                 if(item == null) begin
                     `uvm_fatal(tID, $sformatf("No expected INTR from %0s", fld_name))
                 end
-                exp_id = item.interrupt_id.substr(item.interrupt_id.len-2, item.interrupt_id.len-1);
+                tmp_s = item.interrupt_id.substr(item.interrupt_id.len-2, item.interrupt_id.len-1);
+                exp_id = tmp_s.atoi();
                 if(exp_id != act_id) begin
                     `uvm_fatal(tID, $sformatf("Group of INTR mismatch, exp:%0d, act:%0d", exp_id, act_id))
                 end

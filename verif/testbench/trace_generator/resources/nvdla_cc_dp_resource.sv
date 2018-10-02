@@ -264,7 +264,7 @@ function nvdla_cc_dp_resource::new(string name="nvdla_cc_dp_resource", uvm_compo
     `uvm_info(inst_name, $sformatf("Initialize resource %s ... ",inst_name),UVM_LOW);
 endfunction: new
 
-static function  nvdla_cc_dp_resource nvdla_cc_dp_resource::get_cc_dp(uvm_component parent);
+function  nvdla_cc_dp_resource nvdla_cc_dp_resource::get_cc_dp(uvm_component parent);
     if (null == inst) begin
         inst = new("nvdla_cc_dp_resource", parent);
     end
@@ -272,7 +272,7 @@ static function  nvdla_cc_dp_resource nvdla_cc_dp_resource::get_cc_dp(uvm_compon
 endfunction: get_cc_dp
 
 function void nvdla_cc_dp_resource::trace_dump(int fh);
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

@@ -554,7 +554,7 @@ function automatic void UVMC_report(int severity,
           sev.name(),id,verbosity,
           (contxt==""?"uvm_top":contxt),filename,line),UVM_NONE)
   end
-  top.m_rh.report(severity, contxt, id, message, verbosity, filename, line, top);
+  top.m_rh.report(uvm_severity_type'(severity), contxt, id, message, verbosity, filename, line, top);
 endfunction
 
 
@@ -700,7 +700,7 @@ function void UVMC_set_config_object (string type_name,
                                       bits_t value);
   uvm_object obj;
   uvm_component comp;
-  uvm_factory factory = uvm_factory::get();
+  static uvm_factory factory = uvm_factory::get();
 
   if ($test$plusargs("UVMC_COMMAND_TRACE"))
     `uvm_info("TRACE/UVMC_CMD/SET_CFG_OBJ",

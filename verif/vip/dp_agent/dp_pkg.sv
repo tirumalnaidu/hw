@@ -4,6 +4,8 @@ package dp_pkg;
 
     import uvm_pkg::*;
 
+    `include "uvm_macros.svh"
+   
     `include "dp_defines.sv"
        
     // Transaction objects 

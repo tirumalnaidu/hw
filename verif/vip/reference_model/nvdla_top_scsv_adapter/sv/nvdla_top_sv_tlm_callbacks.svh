@@ -12,6 +12,8 @@
 `ifndef _nvdla_top_sv_tlm_callbacks
 `define _nvdla_top_sv_tlm_callbacks
 
+`include "uvm_macros.svh"
+
 class nvdla_top_sc2sv_nvdla_core2dbb_axi4_tlm_callbacks #(type T = tlm_generic_payload) extends nvdla_scsv_sv_tlm_callbacks #(T);
 
     `uvm_object_utils(nvdla_top_sc2sv_nvdla_core2dbb_axi4_tlm_callbacks);

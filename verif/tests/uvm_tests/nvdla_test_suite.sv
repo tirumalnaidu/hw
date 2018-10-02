@@ -1,3 +1,8 @@
+import uvm_pkg::*;
+`include "uvm_macros.svh"
+
+`include "project.vh"
+
 `include "nvdla_user_define_demo_test.sv"
 /*
     CC test list

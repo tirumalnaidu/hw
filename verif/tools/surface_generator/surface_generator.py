@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from memory_surface import MemorySurfaceWeight, MemorySurfaceFeatureMap, MemorySurfaceFactory
 import argparse

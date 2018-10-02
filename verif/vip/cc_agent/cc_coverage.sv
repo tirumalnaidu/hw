@@ -39,13 +39,13 @@ class cc_cov_cb#(int DW, int MW) extends cc_monitor_callbacks;
 
     cc_coverage cov_obj = new();
 
-    `uvm_object_utils(cc_cov_cb);
+    `uvm_object_param_utils(cc_cov_cb#(DW,MW));
 
     function new(string name = "cc_cov_cb");
         super.new(name);
     endfunction:new
 
-    virtual task post_trans(cc_monitor xactor, cc_txn tr);
+    virtual task post_trans(cc_monitor#(DW,MW) xactor, cc_txn#(DW,MW) tr);
         cov_obj.sample(tr);
     endtask: post_trans
 

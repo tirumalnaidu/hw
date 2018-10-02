@@ -59,7 +59,7 @@ function bit mem_region::is_coherent();
 endfunction
 
 function string mem_region::convert2string();
-    return $sformatf("region %15s: base=%#x, limit=%#x, size=%#x", get_name(), base, limit, limit-base+1);
+    return $sformatf("region %15s: base=0x%x, limit=0x%x, size=0x%x", get_name(), base, limit, limit-base+1);
 endfunction
 
 `endif

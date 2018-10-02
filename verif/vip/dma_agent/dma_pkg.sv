@@ -6,7 +6,8 @@
 package dma_pkg;
 
     import uvm_pkg::*;
-
+    `include "uvm_macros.svh"
+   
     `include "dma_defines.sv"
        
     // Transaction objects 

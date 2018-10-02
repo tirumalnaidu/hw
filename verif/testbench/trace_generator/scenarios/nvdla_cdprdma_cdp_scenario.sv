@@ -69,7 +69,7 @@ function void nvdla_cdprdma_cdp_scenario::set_output_mem_addr();
 endfunction : set_output_mem_addr
 
 function void nvdla_cdprdma_cdp_scenario::trace_dump(int fh);
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

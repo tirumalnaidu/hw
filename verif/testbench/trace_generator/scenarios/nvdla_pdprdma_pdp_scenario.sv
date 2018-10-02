@@ -59,7 +59,7 @@ function void nvdla_pdprdma_pdp_scenario::build_phase(uvm_phase phase);
 endfunction: build_phase
 
 function void nvdla_pdprdma_pdp_scenario::trace_dump(int fh);
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

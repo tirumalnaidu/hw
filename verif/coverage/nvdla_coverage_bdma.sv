@@ -16,27 +16,7 @@ class bdma_cov_pool extends nvdla_coverage_base;
     bit_toggle_cg           cfg_src_surf_tog_cg;
     bit_toggle_cg           cfg_dst_surf_tog_cg;
 
-    function new(string name, ral_sys_top ral);
-        super.new(name, ral);
-
-        bdma_cg = new();
-
-        cfg_src_addr_low_tog_cg  = new("cfg_src_addr_low",  ral.nvdla.NVDLA_BDMA.CFG_SRC_ADDR_LOW.V32.get_n_bits());
-        cfg_dst_addr_low_tog_cg  = new("cfg_dst_addr_low",  ral.nvdla.NVDLA_BDMA.CFG_DST_ADDR_LOW.V32.get_n_bits());
-`ifdef MEM_ADDR_WIDTH_GT_32
-        cfg_src_addr_high_tog_cg = new("cfg_src_addr_high", ral.nvdla.NVDLA_BDMA.CFG_SRC_ADDR_HIGH.V8.get_n_bits());
-        cfg_dst_addr_high_tog_cg = new("cfg_dst_addr_high", ral.nvdla.NVDLA_BDMA.CFG_DST_ADDR_HIGH.V8.get_n_bits());
-`endif
-        cfg_line_tog_cg          = new("cfg_line",          ral.nvdla.NVDLA_BDMA.CFG_LINE.SIZE.get_n_bits());
-        cfg_line_repeat_tog_cg   = new("cfg_line_repeat",   ral.nvdla.NVDLA_BDMA.CFG_LINE_REPEAT.NUMBER.get_n_bits());
-        cfg_surf_repeat_tog_cg   = new("cfg_surf_repeat",   ral.nvdla.NVDLA_BDMA.CFG_SURF_REPEAT.NUMBER.get_n_bits());
-        cfg_src_line_tog_cg      = new("cfg_src_line",      ral.nvdla.NVDLA_BDMA.CFG_SRC_LINE.STRIDE.get_n_bits());
-        cfg_dst_line_tog_cg      = new("cfg_dst_line",      ral.nvdla.NVDLA_BDMA.CFG_DST_LINE.STRIDE.get_n_bits());
-        cfg_src_surf_tog_cg      = new("cfg_src_surf",      ral.nvdla.NVDLA_BDMA.CFG_SRC_SURF.STRIDE.get_n_bits());
-        cfg_dst_surf_tog_cg      = new("cfg_dst_surf",      ral.nvdla.NVDLA_BDMA.CFG_DST_SURF.STRIDE.get_n_bits());
-    endfunction : new
-
-    covergroup bdma_cg;
+       covergroup bdma_cg;
         cp_cfg_src_addr_low:      coverpoint ral.nvdla.NVDLA_BDMA.CFG_SRC_ADDR_LOW.V32.value[2: 0];
         cp_cfg_dst_addr_low:      coverpoint ral.nvdla.NVDLA_BDMA.CFG_DST_ADDR_LOW.V32.value[2: 0];
         cp_line_align:            coverpoint ral.nvdla.NVDLA_BDMA.CFG_LINE.SIZE.value[2: 0];
@@ -91,6 +71,27 @@ class bdma_cov_pool extends nvdla_coverage_base;
         cp_grp0_busy:             coverpoint ral.nvdla.NVDLA_BDMA.STATUS.GRP0_BUSY.value[0];
         cp_grp1_busy:             coverpoint ral.nvdla.NVDLA_BDMA.STATUS.GRP1_BUSY.value[0];
     endgroup : bdma_cg
+
+    function new(string name, ral_sys_top ral);
+        super.new(name, ral);
+
+        bdma_cg = new();
+
+        cfg_src_addr_low_tog_cg  = new("cfg_src_addr_low",  ral.nvdla.NVDLA_BDMA.CFG_SRC_ADDR_LOW.V32.get_n_bits());
+        cfg_dst_addr_low_tog_cg  = new("cfg_dst_addr_low",  ral.nvdla.NVDLA_BDMA.CFG_DST_ADDR_LOW.V32.get_n_bits());
+`ifdef MEM_ADDR_WIDTH_GT_32
+        cfg_src_addr_high_tog_cg = new("cfg_src_addr_high", ral.nvdla.NVDLA_BDMA.CFG_SRC_ADDR_HIGH.V8.get_n_bits());
+        cfg_dst_addr_high_tog_cg = new("cfg_dst_addr_high", ral.nvdla.NVDLA_BDMA.CFG_DST_ADDR_HIGH.V8.get_n_bits());
+`endif
+        cfg_line_tog_cg          = new("cfg_line",          ral.nvdla.NVDLA_BDMA.CFG_LINE.SIZE.get_n_bits());
+        cfg_line_repeat_tog_cg   = new("cfg_line_repeat",   ral.nvdla.NVDLA_BDMA.CFG_LINE_REPEAT.NUMBER.get_n_bits());
+        cfg_surf_repeat_tog_cg   = new("cfg_surf_repeat",   ral.nvdla.NVDLA_BDMA.CFG_SURF_REPEAT.NUMBER.get_n_bits());
+        cfg_src_line_tog_cg      = new("cfg_src_line",      ral.nvdla.NVDLA_BDMA.CFG_SRC_LINE.STRIDE.get_n_bits());
+        cfg_dst_line_tog_cg      = new("cfg_dst_line",      ral.nvdla.NVDLA_BDMA.CFG_DST_LINE.STRIDE.get_n_bits());
+        cfg_src_surf_tog_cg      = new("cfg_src_surf",      ral.nvdla.NVDLA_BDMA.CFG_SRC_SURF.STRIDE.get_n_bits());
+        cfg_dst_surf_tog_cg      = new("cfg_dst_surf",      ral.nvdla.NVDLA_BDMA.CFG_DST_SURF.STRIDE.get_n_bits());
+    endfunction : new
+
 
     task sample();
         uvm_status_e  status;

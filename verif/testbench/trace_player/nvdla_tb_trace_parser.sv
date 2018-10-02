@@ -294,8 +294,8 @@ function void nvdla_tb_trace_parser::parse_trace();
             if(7 == code) begin
                 `uvm_info(tID,$sformatf("kind_name=%s, sync_id=%s, memory_type=%s, base_address=%h, size=%h, golden_crc=%h, golden_file_path=%s",kind_name,sync_id,memory_type,base_address,size,golden_crc,golden_file_path), UVM_NONE);
                 rc_cmd = new("result_checker_cmd");
-                kind_wrapper::from_name(kind_name, rc_cmd.kind);
-                memory_type_wrapper::from_name(memory_type, rc_cmd.memory_type);
+                mem_pkg::kind_wrapper::from_name(kind_name, rc_cmd.kind);
+                mem_pkg::memory_type_wrapper::from_name(memory_type, rc_cmd.memory_type);
                 rc_cmd.sync_id      = sync_id;
                 rc_cmd.base_address = base_address;
                 rc_cmd.size         = size;
@@ -323,8 +323,8 @@ function void nvdla_tb_trace_parser::parse_trace();
             if(6 == code) begin
                 `uvm_info(tID,$sformatf("kind_name=%s, memory_type=%s, base_address=%h, size=%h, pattern=%s, file_path=%s",kind_name,memory_type,base_address,size,pattern,file_path), UVM_NONE);
                 mm_cmd = new("memory_model_cmd");
-                kind_wrapper::from_name(kind_name, mm_cmd.kind);
-                memory_type_wrapper::from_name(memory_type, mm_cmd.memory_type);
+                mem_pkg::kind_wrapper::from_name(kind_name, mm_cmd.kind);
+                mem_pkg::memory_type_wrapper::from_name(memory_type, mm_cmd.memory_type);
                 mm_cmd.base_address = base_address;
                 mm_cmd.size         = size;
                 mm_cmd.pattern      = pattern;

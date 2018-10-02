@@ -8,6 +8,8 @@
 // @description: demo test
 //-------------------------------------------------------------------------------------
 
+`include "nvdla_tg_base_test.sv"
+
 class nvdla_user_define_demo_test extends nvdla_tg_base_test;
 
     function new(string name="nvdla_user_define_demo_test", uvm_component parent);

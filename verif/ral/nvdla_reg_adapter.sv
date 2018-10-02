@@ -8,8 +8,11 @@
 // Extends from uvm_reg_adapter and implement two tasks: reg2bus & bus2reg, for 
 // transformation between ral reg transaction and nvdla bus reg transaction (csb)
 //-------------------------------------------------------------------------------------
+`include "csb_defines.svh"
 import csb_pkg::*;
 import uvm_pkg::*;
+
+`include "uvm_macros.svh"
 
 class nvdla_reg_adapter #(type T = uvm_sequence_item) extends uvm_reg_adapter;
 
@@ -39,6 +42,8 @@ function uvm_sequence_item nvdla_reg_adapter::reg2bus(const ref uvm_reg_bus_op r
     csb_bus_ext   extension;
     csb_ctrl_ext  ctrl_extension;
 
+   typedef bit[63:0] bit64;
+   
     bus_txn   = new("bus_txn");
     //try to get extension from ral.reg.write(.extension())
     $cast(extension, get_item().extension);
@@ -59,7 +64,11 @@ function uvm_sequence_item nvdla_reg_adapter::reg2bus(const ref uvm_reg_bus_op r
         bus_txn.set_write();
     end
     bus_txn.set_streaming_width(`CSB_DATA_WIDTH/8);
-    bus_txn.set_address(rw.addr);
+    //bus_txn.set_address(rw.addr); // Questa needs casting for this...
+    // Because:
+    // rw.addr type is uvm_reg_addr_t
+    // bus_txn.set_address() expected type is bit [63:0]
+    bus_txn.set_address(bit64'(rw.addr));
     byte_en = new[`CSB_DATA_WIDTH/8];
     {<<byte{byte_en}} = {`CSB_DATA_WIDTH{1'b1}};
     bus_txn.set_byte_enable(byte_en);

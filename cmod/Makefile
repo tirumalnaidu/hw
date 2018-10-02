@@ -7,6 +7,16 @@ ifeq ($(SYSTEMC),)
 $(error SYSTEMC variable must be defined in tree.make to build Cmodel)
 endif
 
+ifeq ($(SIM_PLATFORM),mti)
+SYSTEMC_DEFINES += MTI_SYSTEMC
+endif
+
+ifeq ($(SIM_PLATFORM),cds)
+SYSTEMC_DEFINES += NCSC
+endif
+
+CPP_DEFINES := $(addprefix -D,$(SYSTEMC_DEFINES))
+
 TARGET ?= libnvdla_cmod.so
 
 PROJECT_DIR ?= $(DEPTH)/$(OUTDIR)/$(PROJECT)
@@ -155,7 +165,7 @@ LD_DIRS := \
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 LD_FLAGS  := $(addprefix -L,$(LD_DIRS))
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -fPIC -Wall -Werror -DSC_INCLUDE_DYNAMIC_PROCESSES -Wp,-w -std=c++11
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -fPIC -Wall -Werror $(CPP_DEFINES) -DSC_INCLUDE_DYNAMIC_PROCESSES -Wp,-w -std=c++11
 LDFLAGS ?= -shared $(addprefix -l,$($(notdir $(SYSTEMC_LIBRARIES)):lib%.so=%)) $(LD_FLAGS)
 
 $(BUILD_DIR)/$(TARGET): $(OBJS) 

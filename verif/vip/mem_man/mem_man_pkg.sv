@@ -4,7 +4,9 @@
 package mem_man_pkg;
 
     import uvm_pkg::*;
-
+    
+    `include "uvm_macros.svh"
+   
     `include "mem_man_define.svh"
     `include "mem_region.svh"
     `include "mem_domain.svh"

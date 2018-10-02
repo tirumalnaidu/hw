@@ -5,7 +5,11 @@ package mem_pkg;
 
     import uvm_pkg::*;
 
-    `include "nvdla_tb_txn.sv"
+`include "uvm_macros.svh"
+   
+`include "nvdla_tb_types.svh"
+   
+    `include "mem_command.sv"
 
     `include "mem_define.svh"
     `include "mem_core.svh"

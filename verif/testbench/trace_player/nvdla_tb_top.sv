@@ -1,5 +1,36 @@
 `ifndef _NVDLA_TB_TOP_SV_
 `define _NVDLA_TB_TOP_SV_
+
+`include "nvdla_tb_common_defines.svh"
+
+import uvm_pkg::*;
+
+`include "uvm_macros.svh"
+
+`include "nvdla_tb_types.svh"
+
+import dma_pkg::*;
+import cc_pkg::*;
+import dp_pkg::*;
+import csb_pkg::*;
+import dbb_pkg::*;
+import nvdla_ral_pkg::*;
+import mem_pkg::*;
+import nvdla_tb_common_pkg::*;
+
+`include "nvdla_reg_adapter.sv"
+
+`include "nvdla_tb_scoreboard.sv"
+`include "nvdla_tb_override.sv"
+`include "nvdla_tb_txn.sv"
+`include "nvdla_tb_sequence.sv"
+`include "nvdla_tb_intr_handler.sv"
+`include "nvdla_tb_result_checker.sv"
+`include "nvdla_tb_env.sv"
+`include "nvdla_tb_trace_parser.sv"
+
+`include "nvdla_tb_base_test.sv"
+
 `timescale 100ps/100ps
 //-------------------------------------------------------------------------------------
 //
@@ -155,6 +186,7 @@ module nvdla_tb_top;
     //------------------------------------------------------------------WAVEFORM DUMPING
     //
     // @{
+   `ifdef VCS
     initial begin
 		if($test$plusargs("wave")) begin 
 			$display("Dumping FSDB waveform");
@@ -168,11 +200,22 @@ module nvdla_tb_top;
     end
 
     // }@
+   `endif //  `ifdef VCS
 
+   `ifdef MODEL_TECH
+   initial begin
+      if($test$plusargs("wave")) begin
+	 $display("Dumping WLF waveform");
+	 $wlfdumpvars;
+      end
+   end
+   
+   final $dumpflush;
+   `endif
     //----------------------------------------------------------------NVDLA DUT INSTANCE
     //
     // @{
-    NV_nvdla DLA_DUT(/*AUTOINST*/
+   NV_nvdla DLA_DUT(/*AUTOINST*/
                      // Outputs
                      .csb2nvdla_ready               (csb2nvdla_ready),
                      .nvdla2csb_valid               (nvdla2csb_valid),
@@ -384,7 +427,7 @@ module nvdla_tb_top;
 
         glb_evts = uvm_event_pool::get_global_pool();
         if(glb_evts == null) begin
-            `uvm_fatal("NVDLA_TB_TOP", "Failed to get global event pool")
+           `uvm_fatal("NVDLA_TB_TOP","Failed to get global event pool")
         end
         glb_evts.add("dut_intr_evt", dut_evt);
         glb_evts.add("rm_intr_evt",  rm_evt);
@@ -461,7 +504,7 @@ module nvdla_tb_top;
                 end  
             end      
             if( counter > 5000 ) begin
-                `uvm_fatal("NVDLA_TB_TOP", "TIMEOUT: over 5000 core clock cycles both I/Fs and internal busy indicator are IDLE. Terminate simulation now ...");
+               `uvm_fatal("NVDLA_TB_TOP", "TIMEOUT: over 5000 core clock cycles both I/Fs and internal busy indicator are IDLE. Terminate simulation now ...")
             end      
         end          
     end
@@ -524,7 +567,7 @@ module nvdla_tb_top;
             else begin
               uvm_event sim_done_evt;
               if(!glb_evts.exists("sim_done_evt")) begin
-                  `uvm_fatal("NVDLA_TB_TOP","Fail to get sim_done_evt from global_event_pool")
+                  `uvm_fatal("NVDLA_TB_TOP", "Fail to get sim_done_evt from global_event_pool")
               end
               sim_done_evt = glb_evts.get("sim_done_evt");
               sim_done_evt.wait_on();

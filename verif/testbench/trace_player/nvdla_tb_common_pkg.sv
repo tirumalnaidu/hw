@@ -1,5 +1,5 @@
-`ifndef _NVDLA_TB_COMMON_SVH_
-`define _NVDLA_TB_COMMON_SVH_
+`ifndef _NVDLA_TB_COMMON_PKG_SV_
+`define _NVDLA_TB_COMMON_PKG_SV_
 //
 // Component: ntb_common.svh
 //
@@ -9,7 +9,7 @@
 
 
 `include "project.vh"
-
+/*
 `ifdef NVDLA_PRIMARY_MEMIF_WIDTH
     `define DBB_DATA_WIDTH `NVDLA_PRIMARY_MEMIF_WIDTH
 `endif
@@ -50,6 +50,9 @@
 `endif
 
 
+`ifndef _NVDLA_TB_COMMON_SVH_
+`define _NVDLA_TB_COMMON_SVH_
+*/
 package nvdla_tb_common_pkg;
 
     //Define global message print verbosity macros
@@ -99,4 +102,4 @@ package nvdla_tb_common_pkg;
 
 endpackage: nvdla_tb_common_pkg
 
-`endif // _NVDLA_TB_COMMON_SVH_
+`endif // _NVDLA_TB_COMMON_PKG_SV_

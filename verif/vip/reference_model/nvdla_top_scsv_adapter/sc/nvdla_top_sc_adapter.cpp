@@ -117,3 +117,9 @@ nvdla_top_sc_adapter::nvdla_top_sc_adapter(sc_module_name name):sc_module(name)
   nvdla_top_sc_inst->nvdla_intr(nvdla_top_sc_layer_inst->nvdla_top_sc2sv_nvdla_intr);
   nvdla_top_sc_layer_inst->nvdla_top_sc2sv_nvdla_intr(nvdla_top_sc2sv_nvdla_intr);
 };
+
+#ifdef MTI_SYSTEMC
+SC_MODULE_EXPORT(nvdla_top_sc_adapter);
+#elif NCSC
+NCSC_MODULE_EXPORT(nvdla_top_sc_adapter);
+#endif

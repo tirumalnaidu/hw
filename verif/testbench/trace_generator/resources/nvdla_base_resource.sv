@@ -168,7 +168,7 @@ function longint unsigned nvdla_base_resource::calc_mem_size(int unsigned n_batc
     mem_size  = (n_batch > 1) ? batch_stride*n_batch
                               : surface_stride*n_surface;
     `uvm_info(inst_name,
-        $sformatf("n_batch = %#0x, batch_stride = %#0x, n_channel = %#0x, element_per_atom = %#0x, surface_stride = %#0x, mem_size = %#0x",
+        $sformatf("n_batch = 0x%0x, batch_stride = 0x%0x, n_channel = 0x%0x, element_per_atom = 0x%0x, surface_stride = 0x%0x, mem_size = 0x%0x",
         n_batch, batch_stride, n_channel, element_per_atom, surface_stride, mem_size), UVM_NONE)
     return mem_size;
 endfunction : calc_mem_size
@@ -181,7 +181,7 @@ function longint unsigned nvdla_base_resource::calc_mem_size_plane(int unsigned 
     line_size = (line_stride + size_alignment - 1)/size_alignment*size_alignment;
     mem_size = line_size * height;
     `uvm_info(inst_name,
-        $sformatf("height = %#0x, line_stride = %#0x, size_alignment = %#0x, mem_size = %#0x",
+        $sformatf("height = 0x%0x, line_stride = 0x%0x, size_alignment = 0x%0x, mem_size = 0x%0x",
         height, line_stride, size_alignment, mem_size), UVM_NONE)
     return mem_size;
 endfunction : calc_mem_size_plane

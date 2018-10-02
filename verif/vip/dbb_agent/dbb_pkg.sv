@@ -2,6 +2,10 @@
 // A package of small utility classes and functions.
 `include "nvdla_toolbox.sv"
 
+`include "dbb_params.sv"
+`include "dbb_interface.sv"
+`include "dbb_port_list_if.sv"
+
 package dbb_pkg;
     import uvm_pkg::*;
 `ifdef DBB_AGENT_TEST
@@ -10,7 +14,7 @@ package dbb_pkg;
 `endif
 
     `include "dbb_defines.svh"
-    `include "dbb_params.sv"
+//    `include "dbb_params.sv"
     
     // Logger
     `include "nvdla_txn_logger.sv"
@@ -49,6 +53,7 @@ package dbb_pkg;
     `include "dbb_bus_object.sv"
 
 endpackage: dbb_pkg
-
+/*
 `include "dbb_interface.sv"
 `include "dbb_port_list_if.sv"
+*/

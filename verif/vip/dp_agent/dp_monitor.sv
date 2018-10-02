@@ -252,12 +252,21 @@ function void dp_monitor::read_control(dp_txn#(DW,DS) cur_trans);
 
     pad_data = mon_if.monclk.pd;
     if(PW % 8 == 0) begin // PW: 128(large)/8(small) SDP2PDP
-        {<<DW{sdp_data}}   = pad_data;
-        cur_trans.sdp_data = sdp_data;
+       // Questa does not support parameter as a slice_size
+       // {<<DW{sdp_data}}   = pad_data;
+       for (int iter = 0; iter < PW/DW; iter++) begin
+	  sdp_data[iter] = pad_data[DW*iter+:DW];
+       end
+       cur_trans.sdp_data = sdp_data;
     end
     else begin // PW: 514(large)/34(small) ACCU2SDP
         {cur_trans.layer_end,cur_trans.batch_end} = pad_data[PW-1:PW-2];
-        {<<DW{accu_data}} = {DW*DS{1'b1}} & pad_data[PW-3:0];
+       // Questa does not support parameter as a slice_size
+       // {<<DW{accu_data}} = {DW*DS{1'b1}} & pad_data[PW-3:0];
+       for (int iter = 0; iter < DS; iter++) begin
+	  accu_data[iter] = pad_data[DW*iter+:DW];
+       end
+       
         cur_trans.accu_data = accu_data;
     end
 endfunction

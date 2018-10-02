@@ -2,6 +2,10 @@
 package nvdla_coverage_pkg;
 
     import uvm_pkg::*;
+`include "uvm_macros.svh"
+
+`include "project.vh"
+   
     import csb_pkg::*;
     import nvdla_ral_pkg::*;
 

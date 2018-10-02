@@ -13,6 +13,8 @@ import nvdla_resource_pkg::*;
 import nvdla_scenario_pkg::*;
 import mem_man_pkg::*;
 
+`include "nvdla_tg_common.svh"
+
 class nvdla_tg_core extends uvm_component;
     string                      inst_name;
 

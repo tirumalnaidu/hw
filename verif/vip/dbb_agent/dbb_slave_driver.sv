@@ -9,7 +9,7 @@
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-typedef class dbb_slave_driver;
+//typedef class dbb_slave_driver;
    
 `ifdef DRIVER_CALLBACKS
 /// Callback class for the dbb_slave_driver.
@@ -21,22 +21,22 @@ class dbb_slave_driver_callbacks extends uvm_callback;
     endfunction: new
 
     /// Called at start of observed transaction after latching relevant signal values.
-    virtual function void pre_trans(dbb_slave_driver xactor,
+    virtual function void pre_trans(/*dbb_slave_driver xactor,*/  // Transactor not needed here, pair formed at callback registration time.
                                     uvm_tlm_gp tr);
     endfunction: pre_trans
 
     /// Called at end of observed transaction.
-    virtual function void post_trans(dbb_slave_driver xactor,
+    virtual function void post_trans(/*dbb_slave_driver xactor,*/
                                      uvm_tlm_gp tr);
     endfunction: post_trans
 
     /// Called immediately before driving response (read or write).
-    virtual function void pre_response(dbb_slave_driver xactor,
+    virtual function void pre_response(/*dbb_slave_driver xactor,*/
                                        uvm_tlm_gp tr);
     endfunction: pre_response
     
     /// Called immediately after driving response (read or write).
-    virtual function void post_response(dbb_slave_driver xactor,
+    virtual function void post_response(/*dbb_slave_driver xactor,*/
                                         uvm_tlm_gp tr);
     endfunction: post_response
 
@@ -44,34 +44,34 @@ class dbb_slave_driver_callbacks extends uvm_callback;
     /// mem.write().  Return 1 through skip to avoid the mem.write() call,
     /// default is to allow mem.write() call to occur as soon as data and
     /// address become available.
-    virtual function void skip_mem_write(dbb_slave_driver xactor,
+    virtual function void skip_mem_write(/*dbb_slave_driver xactor,*/
                                          uvm_tlm_gp tr,
                                          ref bit skip);
     endfunction: skip_mem_write
     
     /// Called immediately after receipt of the last beat of write data.
-    virtual function void post_write_data(dbb_slave_driver xactor,
+    virtual function void post_write_data(/*dbb_slave_driver xactor,*/
                                           uvm_tlm_gp tr);
     endfunction: post_write_data
 
     /// Used to arbitrarily delay the assertion of ARREADY.  This is called when RVALID asserts.  If
     /// it returns true ARREADY will stay low and this function will be called again on the next
     /// clock cycle.  This callback is never called if default_arready_value is 1.
-    virtual function bit arready_backpressure( dbb_slave_driver xactor,
+    virtual function bit arready_backpressure(/* dbb_slave_driver xactor,*/
                                                uvm_tlm_gp tr);
     endfunction : arready_backpressure
 
     /// Used to arbitrarily delay the assertion of AWREADY.  This is called when BVALID asserts.  If
     /// it returns true AWREADY will stay low and this function will be called again on the next
     /// clock cycle.  This callback is never called if default_awready_value is 1.
-    virtual function bit awready_backpressure( dbb_slave_driver xactor,
+    virtual function bit awready_backpressure( /*dbb_slave_driver xactor,*/
                                                uvm_tlm_gp tr);
     endfunction : awready_backpressure
 
     /// Used to arbitrarily delay the assertion of WREADY.  This is called when BVALID asserts.  If
     /// it returns true WREADY will stay low and this function will be called again on the next
     /// clock cycle.  This callback is never called if default_wready_value is 1.
-    virtual function bit wready_backpressure( dbb_slave_driver xactor,
+    virtual function bit wready_backpressure( /*dbb_slave_driver xactor,*/
                                               uvm_tlm_gp tr);
     endfunction : wready_backpressure
 
@@ -330,7 +330,7 @@ class read_data_queue;
 
 endclass: read_data_queue
   
-typedef class dbb_slave_agent;
+//typedef class dbb_slave_agent;
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -376,10 +376,10 @@ class dbb_slave_driver #(int MEM_DATA_WIDTH=512, type REQ = uvm_tlm_gp, RSP = RE
     int active_txn_q[uvm_tlm_gp];
 
     // Synchronize concurrent loops
-    protected semaphore write_address_channel_complete;
-    protected semaphore write_data_channel_complete;
+    /*protected*/ semaphore write_address_channel_complete;
+    /*protected*/ semaphore write_data_channel_complete;
     protected semaphore write_response_reorder_complete;
-    protected semaphore read_address_channel_complete;
+    /*protected*/ semaphore read_address_channel_complete;
     protected semaphore read_response_reorder_complete;
     protected semaphore pull_new_transaction;
     // start_write_transaction_sem is for preventing race conditions between the write address and
@@ -523,33 +523,33 @@ class dbb_slave_driver #(int MEM_DATA_WIDTH=512, type REQ = uvm_tlm_gp, RSP = RE
     endfunction: get_disallowed_read_data
     
 //////////////////////////////////////////////////////////////////////
-    extern protected task init_read_txn(ref uvm_tlm_gp tr);
-    extern protected task init_write_txn(ref uvm_tlm_gp tr);
-    extern protected task get_new_transaction(ref uvm_tlm_gp tr);
+    extern /*protected*/ task init_read_txn(ref uvm_tlm_gp tr);
+    extern /*protected*/ task init_write_txn(ref uvm_tlm_gp tr);
+    extern /*protected*/ task get_new_transaction(ref uvm_tlm_gp tr);
     extern function void rightsize_txn_arrays(uvm_tlm_gp tr);
     extern function void upsize_txn_arrays(uvm_tlm_gp tr);
     extern function void check_txn_arrays(uvm_tlm_gp tr);
 
-    extern protected task transaction_started(uvm_tlm_gp tr);
-    extern protected task transaction_finished(uvm_tlm_gp tr);
+    extern /*protected*/ task transaction_started(uvm_tlm_gp tr);
+    extern /*protected*/ task transaction_finished(uvm_tlm_gp tr);
     ///@}
 
     ///@name Read Transaction Processing
-    extern protected function void insert_read_data(uvm_tlm_gp tr);
+    extern /*protected*/ function void insert_read_data(uvm_tlm_gp tr);
     extern protected function uvm_tlm_gp get_next_read_beat();
     extern protected task drive_read_data_channel(uvm_tlm_gp tr);
-    extern protected function dbb_ctrl_ext#()::resp_type_e get_read_response(uvm_tlm_gp tr);
+    extern protected function dbb_ctrl_ext::resp_type_e get_read_response(uvm_tlm_gp tr);
     extern protected function void quiesce_read_data_channel();
     ///@}
 
 
     /// @name Write Transaction Processing
     ///@{
-    extern protected function void check_write_data_complete(uvm_tlm_gp tr);
+    extern /*protected*/ function void check_write_data_complete(uvm_tlm_gp tr);
     extern protected function void sample_write_address(uvm_tlm_gp tr, bit size_init_array);
     extern protected task sample_write_data(uvm_tlm_gp tr);
-    extern protected task write_beat_finished(uvm_tlm_gp tr);
-    extern protected task find_write_txn_for_beat(ref uvm_tlm_gp tr);
+    extern /*protected*/ task write_beat_finished(uvm_tlm_gp tr);
+    extern /*protected*/ task find_write_txn_for_beat(ref uvm_tlm_gp tr);
     extern protected function uvm_tlm_gp check_write_before_addr();
     extern protected function void delete_from_write_data_queue(uvm_tlm_gp tr);
     ///@}
@@ -558,7 +558,7 @@ class dbb_slave_driver #(int MEM_DATA_WIDTH=512, type REQ = uvm_tlm_gp, RSP = RE
     ///@{
     extern protected function void insert_write_response(uvm_tlm_gp tr);
     extern protected function void drive_write_resp_channel(uvm_tlm_gp tr);
-    extern protected function dbb_ctrl_ext#()::resp_type_e get_write_response(uvm_tlm_gp tr);
+    extern protected function dbb_ctrl_ext::resp_type_e get_write_response(uvm_tlm_gp tr);
     extern protected function void quiesce_write_resp_channel();
     ///@}
 
@@ -576,18 +576,18 @@ class dbb_slave_driver #(int MEM_DATA_WIDTH=512, type REQ = uvm_tlm_gp, RSP = RE
         // We need to make sure we mask this, just in case the data bus is driving
         // values on the other lanes.
         mask = (1 << number_bits) - 1;
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("mask:%#0x", mask), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("mask:0x%0x", mask), UVM_DEBUG)
     
         // Shift out of the appropriate lane
         unshift_lane_data = busdata >> (byte_lane(tr,beatnum,dbus_width,number_bits) * number_bits);
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("byte_lane:%#0x", byte_lane(tr,beatnum,dbus_width,number_bits)), UVM_DEBUG)
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:%#0x", unshift_lane_data), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("byte_lane:0x%0x", byte_lane(tr,beatnum,dbus_width,number_bits)), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:0x%0x", unshift_lane_data), UVM_DEBUG)
         // Apply the mask 
         unshift_lane_data &= mask;
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:%#0x", unshift_lane_data), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:0x%0x", unshift_lane_data), UVM_DEBUG)
         // Now shift even further if unaligned access
         unshift_lane_data >>= 8*misalignment_offset(tr, beatnum); 
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:%#0x", unshift_lane_data), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:0x%0x", unshift_lane_data), UVM_DEBUG)
     
     endfunction: unshift_lane_data
     
@@ -606,17 +606,17 @@ class dbb_slave_driver #(int MEM_DATA_WIDTH=512, type REQ = uvm_tlm_gp, RSP = RE
     
         // Convert write strobes into a bit mask
         mask      = get_strobe_mask(wstrb);
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_AND_MERGE", $psprintf("wstrb:%#0x .. preshiftmask:%#0x", wstrb, mask), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_AND_MERGE", $psprintf("wstrb:0x%0x .. preshiftmask:0x%0x", wstrb, mask), UVM_DEBUG)
     
         // Shift both the mask and the bus data out of byte lane to right justified
         mask    >>= (byte_lane(tr,beatnum,dbus_width,number_bits) * number_bits);
         busdata >>= (byte_lane(tr,beatnum,dbus_width,number_bits) * number_bits);
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_AND_MERGE", $psprintf("byte_lane:%0d .. postshift mask:%#0x .. postshift busdata:%#0x",byte_lane(tr,beatnum,dbus_width,number_bits), mask, busdata), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_AND_MERGE", $psprintf("byte_lane:%0d .. postshift mask:0x%0x .. postshift busdata:0x%0x",byte_lane(tr,beatnum,dbus_width,number_bits), mask, busdata), UVM_DEBUG)
     
         // Mask the new bus data and existing memory data
         busdata      &= mask;
         existingdata &= ~mask;
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_AND_MERGE", $psprintf("busdata:%#0x .. existingdata:%#0x", busdata, existingdata), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_AND_MERGE", $psprintf("busdata:0x%0x .. existingdata:0x%0x", busdata, existingdata), UVM_DEBUG)
     
         // Merge new bus data with existing memory data based on write strobes
         unshift_and_merge = busdata + existingdata;
@@ -636,18 +636,18 @@ class dbb_slave_driver #(int MEM_DATA_WIDTH=512, type REQ = uvm_tlm_gp, RSP = RE
         // Shift data left if this happens to be an unaligned beat.
         //shift_lane_data = get_data_for_beat(tr,beatnum) << 8*misalignment_offset(tr, beatnum);
         get_bit_data_for_beat(tr, beatnum, shift_lane_data);
-        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:%#0x .. size:%#0x", shift_lane_data, tr_bus.get_size()), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:0x%0x .. size:0x%0x", shift_lane_data, tr_bus.get_size()), UVM_DEBUG)
         shift_lane_data <<= 8*misalignment_offset(tr, beatnum);
-        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:%#0x .. size:%#0x .. beatnum:%0d .. misalignment_offset:%0d", shift_lane_data, tr_bus.get_size(), beatnum, misalignment_offset(tr, beatnum)), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:0x%0x .. size:0x%0x .. beatnum:%0d .. misalignment_offset:%0d", shift_lane_data, tr_bus.get_size(), beatnum, misalignment_offset(tr, beatnum)), UVM_DEBUG)
         // Calculate data mask
         mask = (1 << number_bits) - 1;
-        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("mask:%#0x", mask), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("mask:0x%0x", mask), UVM_DEBUG)
         // Mask only the valid bits before driving onto bus, just to make sure
         // we don't try to drive too large of a data value.
         shift_lane_data &= mask;
         // Now shift into proper byte lane
         shift_lane_data <<= (byte_lane(tr,beatnum,dbus_width,number_bits) * number_bits);
-        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:%#0x .. bits:%0d", shift_lane_data, number_bits), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:0x%0x .. bits:%0d", shift_lane_data, number_bits), UVM_DEBUG)
     
     endfunction: shift_lane_data
     //----------------------------------------------------------------------
@@ -754,13 +754,13 @@ class dbb_slave_driver #(int MEM_DATA_WIDTH=512, type REQ = uvm_tlm_gp, RSP = RE
         `CAST_DBB_EXT(,tr,bus)
         bytes_per_beat = tr_bus.get_size();
         if (MEM_DATA_WIDTH < 8*bytes_per_beat) begin
-            `uvm_fatal("DBB_HELPER_EXT", $psprintf("Data width not sized correctly. %0d needs to be larger than $d", MEM_DATA_WIDTH, 8*bytes_per_beat))
+            `uvm_fatal("DBB_HELPER_EXT", $psprintf("Data width not sized correctly. %0d needs to be larger than %0d", MEM_DATA_WIDTH, 8*bytes_per_beat))
         end
         starting_byte = beatnum * bytes_per_beat;
         tr.get_data(original_data);
         `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT", $psprintf("starting_byte:%0d, bytes_per_beat:%0d, beatnum:%0d",starting_byte, bytes_per_beat, beatnum), UVM_DEBUG)
         for (i=0; i<bytes_per_beat; i++) begin
-          `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT", $psprintf("ret_data:%#0x, original_data:%#0x",ret_data[i*8+:8], original_data[starting_byte+i]), UVM_DEBUG)
+          `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT", $psprintf("ret_data:0x%0x, original_data:0x%0x",ret_data[i*8+:8], original_data[starting_byte+i]), UVM_DEBUG)
           ret_data[i*8+:8] = original_data[starting_byte+i];
         end     
     endfunction : get_bit_data_for_beat
@@ -773,7 +773,7 @@ class dbb_slave_driver #(int MEM_DATA_WIDTH=512, type REQ = uvm_tlm_gp, RSP = RE
         `CAST_DBB_EXT(,tr,bus)
         bytes_per_beat = tr_bus.get_size();
         if (MEM_WSTRB_WIDTH < bytes_per_beat) begin
-            `uvm_fatal("DBB_HELPER_EXT", $psprintf("Data width not sized correctly. %0d needs to be larger than $d", MEM_DATA_WIDTH, bytes_per_beat))
+            `uvm_fatal("DBB_HELPER_EXT", $psprintf("Data width not sized correctly. %0d needs to be larger than %0d", MEM_DATA_WIDTH, bytes_per_beat))
         end
         starting_byte = beatnum * bytes_per_beat;
         tr.get_byte_enable(original_wstrb);
@@ -802,9 +802,9 @@ class dbb_slave_driver #(int MEM_DATA_WIDTH=512, type REQ = uvm_tlm_gp, RSP = RE
     
         `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT", $psprintf("starting_byte:%0d, bytes_per_beat:%0d, beatnum:%0d",starting_byte, bytes_per_beat, beatnum), UVM_DEBUG)
         for (i=0; i<bytes_per_beat; i++) begin
-            `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT/BEFORE", $psprintf("set_data:%#0x, original_data:%#0x, i:%0d",data[i*8+:8], original_data[starting_byte+i],i), UVM_DEBUG)
+            `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT/BEFORE", $psprintf("set_data:0x%0x, original_data:0x%0x, i:%0d",data[i*8+:8], original_data[starting_byte+i],i), UVM_DEBUG)
             original_data[starting_byte+i] = data[i*8+:8];
-            `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT/AFTER", $psprintf("set_data:%#0x, original_data:%#0x, new_size:%0d",data[i*8+:8], original_data[starting_byte+i], original_data.size()), UVM_DEBUG)
+            `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT/AFTER", $psprintf("set_data:0x%0x, original_data:0x%0x, new_size:%0d",data[i*8+:8], original_data[starting_byte+i], original_data.size()), UVM_DEBUG)
         end
         tr.set_data(original_data);
         tr.set_data_length(original_data.size()); // necessary
@@ -961,14 +961,210 @@ class dbb_slave_driver #(int MEM_DATA_WIDTH=512, type REQ = uvm_tlm_gp, RSP = RE
         tr.set_streaming_width(length);
     endfunction
 
+//////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////
+   //
+   //                    READ ADDRESS CHANNEL
+   //
+   //////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////
+   // Interface functions for the state machine object.
 
-endclass : dbb_slave_driver
+   task dbb_slave_driver_read_address_channel_sm::wait_clock();
+
+      @(driver.drv_if.sclk);
+
+   endtask // wait_clock
+
+   function void dbb_slave_driver_read_address_channel_sm::drive_ready( logic value );
+
+      driver.drv_if.sclk.arready <= value;
+
+   endfunction // drive_ready
+
+   function logic dbb_slave_driver_read_address_channel_sm::sample_valid();
+
+      return driver.drv_if.sclk.arvalid;
+
+   endfunction // sample_valid
+
+   function int dbb_slave_driver_read_address_channel_sm::get_valid_ready_delay();
+
+      dbb_ctrl_ext active_rdadd_txn_ctrl;
+
+          `CAST_DBB_EXT(,active_rdadd_txn,ctrl)
+      return active_rdadd_txn_ctrl.avalid_aready_delay;
+
+   endfunction // get_valid_ready_delay
+
+   function int dbb_slave_driver_read_address_channel_sm::get_ready_delay();
+
+      dbb_ctrl_ext active_rdadd_txn_ctrl;
+
+          `CAST_DBB_EXT(,active_rdadd_txn,ctrl)
+      return active_rdadd_txn_ctrl.aready_delay;
+
+   endfunction // get_ready_delay
+
+   task dbb_slave_driver_read_address_channel_sm::initiate_beat();
+
+          `uvm_info("DBB/SLV/DRV/RDADD/INITIATE_BEAT", "dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::initiate_beat", UVM_DEBUG)
+      driver.init_read_txn(active_rdadd_txn);
+
+      driver.transaction_started(active_rdadd_txn);
+
+   endtask // initiate_beat
+
+   task dbb_slave_driver_read_address_channel_sm::beat_finished();
+
+      driver.insert_read_data(active_rdadd_txn);
+
+   endtask // beat_finished
+
+`ifdef DRIVER_CALLBACKS
+   function bit dbb_slave_driver_read_address_channel_sm::do_backpressure_callback();
+
+          `uvm_do_obj_callbacks_exit_on(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks, driver,
+					                                  arready_backpressure(/*driver,*/ active_rdadd_txn), 1)
+   endfunction // do_backpressure_callback
+`endif
+
+   task dbb_slave_driver_read_address_channel_sm::post_sm();
+
+          // Signal read data buffer to go
+      driver.read_address_channel_complete.put(1);
+
+   endtask // post_sm
+
+   //////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////
+   //
+   //                    WRITE ADDRESS CHANNEL
+   //
+   //////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////
+   // Interface functions for the state machine object.
+   
+   task dbb_slave_driver_write_address_channel_sm::wait_clock();
+      @(driver.drv_if.sclk);
+   endtask
+   
+   function void dbb_slave_driver_write_address_channel_sm::drive_ready( logic value );
+      driver.drv_if.sclk.awready <= value;
+   endfunction
+   
+   function logic dbb_slave_driver_write_address_channel_sm::sample_valid();
+      return driver.drv_if.sclk.awvalid;
+   endfunction
+   
+   function int dbb_slave_driver_write_address_channel_sm::get_valid_ready_delay();
+      dbb_ctrl_ext active_wradd_txn_ctrl;
+      `CAST_DBB_EXT(,active_wradd_txn,ctrl)
+      return active_wradd_txn_ctrl.avalid_aready_delay;
+   endfunction
+   
+   function int dbb_slave_driver_write_address_channel_sm::get_ready_delay();
+      dbb_ctrl_ext active_wradd_txn_ctrl;
+      `CAST_DBB_EXT(,active_wradd_txn,ctrl)
+      return active_wradd_txn_ctrl.aready_delay;
+   endfunction
+   
+   task dbb_slave_driver_write_address_channel_sm::initiate_beat();
+      `uvm_info("DBB/SLV/DRV/WRADD/INITIATE_BEAT", "dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::initiate_beat", UVM_DEBUG)
+      driver.init_write_txn(active_wradd_txn);
+   endtask
+   
+   task dbb_slave_driver_write_address_channel_sm::beat_finished();
+      dbb_helper_ext active_wradd_txn_helper;
+      `CAST_DBB_EXT(,active_wradd_txn,helper)
+      `uvm_info("DBB/SLV/DRV/WRADD/INITIATE_BEAT", "dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::beat_finished", UVM_DEBUG)
+      driver.check_write_data_complete(active_wradd_txn);
+      `uvm_info("NVDLA/DBB/SLV/DRV/TXN_TRACE",{"\n",active_wradd_txn_helper.print(active_wradd_txn)},UVM_DEBUG);
+   endtask
+   
+`ifdef DRIVER_CALLBACKS
+   function bit dbb_slave_driver_write_address_channel_sm::do_backpressure_callback();
+      `uvm_do_obj_callbacks_exit_on(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks, driver,
+                                    awready_backpressure(/*driver,*/ active_wradd_txn), 1)
+   endfunction
+`endif
+   
+   task dbb_slave_driver_write_address_channel_sm::post_sm();
+      // Tell data channel that it's their turn to process
+      driver.write_address_channel_complete.put(1);
+   endtask
 
 //////////////////////////////////////////////////////////////////////
-/// Creates new dbb_slave_driver object
-function dbb_slave_driver::new(string        inst = "dbb_slave_driver",
-                                     uvm_component parent = null);
+//////////////////////////////////////////////////////////////////////
+//
+//                    WRITE DATA CHANNEL
+//
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+// Interface functions for the state machine object.
 
+task dbb_slave_driver_write_data_channel_sm::wait_clock();
+    @(driver.drv_if.sclk);
+endtask
+
+function void dbb_slave_driver_write_data_channel_sm::drive_ready( logic value );
+    driver.drv_if.sclk.wready <= value;
+endfunction
+
+function logic dbb_slave_driver_write_data_channel_sm::sample_valid();
+    return driver.drv_if.sclk.wvalid;
+endfunction
+
+function int dbb_slave_driver_write_data_channel_sm::get_valid_ready_delay();
+    dbb_ctrl_ext active_wrd_txn_ctrl;
+    dbb_helper_ext active_wrd_txn_helper;
+    `CAST_DBB_EXT(,active_wrd_txn,ctrl)
+    `CAST_DBB_EXT(,active_wrd_txn,helper)
+    return active_wrd_txn_ctrl.wvalid_wready_delay[active_wrd_txn_helper.n_data];
+endfunction
+
+function int dbb_slave_driver_write_data_channel_sm::get_ready_delay();
+    dbb_ctrl_ext active_wrd_txn_ctrl;
+    dbb_helper_ext active_wrd_txn_helper;
+    `CAST_DBB_EXT(,active_wrd_txn,ctrl)
+    `CAST_DBB_EXT(,active_wrd_txn,helper)
+    return active_wrd_txn_ctrl.wready_delay[active_wrd_txn_helper.n_data];
+endfunction
+
+task dbb_slave_driver_write_data_channel_sm::initiate_beat();
+    `uvm_info("DBB/SLV/DRV/WRDATA/INITIATE_BEAT", "dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::initiate_beat", UVM_DEBUG)
+    driver.find_write_txn_for_beat(active_wrd_txn);
+endtask
+
+task dbb_slave_driver_write_data_channel_sm::beat_finished();
+    driver.write_beat_finished(active_wrd_txn);
+endtask
+
+`ifdef DRIVER_CALLBACKS
+function bit dbb_slave_driver_write_data_channel_sm::do_backpressure_callback();
+    `uvm_do_obj_callbacks_exit_on(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks, driver,
+                                  wready_backpressure(/*driver,*/ active_wrd_txn), 1)
+endfunction
+`endif
+
+task dbb_slave_driver_write_data_channel_sm::pre_sm();
+    // Let write address channel complete first to make sure that address
+    // is handled before simultaneous data for that same transaction
+    driver.write_address_channel_complete.get();
+endtask
+
+task dbb_slave_driver_write_data_channel_sm::post_sm();
+    // Tell data channel that it's their turn to process
+    driver.write_data_channel_complete.put(1);
+endtask
+   
+endclass : dbb_slave_driver
+   
+//////////////////////////////////////////////////////////////////////
+/// Creates new dbb_slave_driver object
+   function dbb_slave_driver::new(string        inst = "dbb_slave_driver",
+                                  uvm_component parent = null);
+      
     super.new(inst, parent);
 
     // Create event objects
@@ -997,7 +1193,7 @@ endfunction: new
 //////////////////////////////////////////////////////////////////////
 /// Automatically runs during the UVM build phase.
 function void dbb_slave_driver::build_phase(uvm_phase phase);
-    dbb_slave_agent n_agent;
+//    dbb_slave_agent n_agent;
     super.build_phase(phase);
     `uvm_info(tID, $sformatf("build_phase begin ..."), UVM_LOW)
 
@@ -1039,7 +1235,7 @@ function void dbb_slave_driver::connect_phase(uvm_phase phase);
 `endif
     // Hook up the virtual interface here
     if (!uvm_config_db#(virtual dbb_interface#(MEM_DATA_WIDTH))::get(this, "", "drv_if", temp_if)) begin
-        if (!uvm_config_db#(virtual dbb_interface#(MEM_DATA_WIDTH).Slave)::get(this, "", "drv_if", drv_if)) begin
+        if (!uvm_config_db#(virtual dbb_interface#(MEM_DATA_WIDTH)/*.Slave*/)::get(this, "", "drv_if", drv_if)) begin
             `uvm_fatal("NVDLA/DBB/SLV/DRV/NOVIF", "No virtual interface specified for this driver instance")
         end
     end
@@ -1260,61 +1456,6 @@ function void dbb_slave_driver::kill_txn(uvm_tlm_gp txn);
 endfunction: kill_txn
 
 //////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-//
-//                    READ ADDRESS CHANNEL
-//
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-// Interface functions for the state machine object.
-
-task dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::wait_clock();
-    @(driver.drv_if.sclk);
-endtask
-
-function void dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::drive_ready( logic value );
-    driver.drv_if.sclk.arready <= value;
-endfunction
-
-function logic dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::sample_valid();
-    return driver.drv_if.sclk.arvalid;
-endfunction
-
-function int dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::get_valid_ready_delay();
-    dbb_ctrl_ext active_rdadd_txn_ctrl;
-    `CAST_DBB_EXT(,active_rdadd_txn,ctrl)
-    return active_rdadd_txn_ctrl.avalid_aready_delay;
-endfunction
-
-function int dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::get_ready_delay();
-    dbb_ctrl_ext active_rdadd_txn_ctrl;
-    `CAST_DBB_EXT(,active_rdadd_txn,ctrl)
-    return active_rdadd_txn_ctrl.aready_delay;
-endfunction
-
-task dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::initiate_beat();
-    `uvm_info("DBB/SLV/DRV/RDADD/INITIATE_BEAT", "dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::initiate_beat", UVM_DEBUG)
-    driver.init_read_txn(active_rdadd_txn);
-    driver.transaction_started(active_rdadd_txn);
-endtask
-
-task dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::beat_finished();
-    driver.insert_read_data(active_rdadd_txn);
-endtask
-
-`ifdef DRIVER_CALLBACKS
-function bit dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::do_backpressure_callback();
-    `uvm_do_obj_callbacks_exit_on(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks, driver,
-                                  arready_backpressure(driver, active_rdadd_txn), 1)
-endfunction
-`endif
-
-task dbb_slave_driver::dbb_slave_driver_read_address_channel_sm::post_sm();
-    // Signal read data buffer to go
-    driver.read_address_channel_complete.put(1);
-endtask
-
-//////////////////////////////////////////////////////////////////////
 /// For the general case, defer to transaction's math for calculating
 /// conversion from beat to address.  For specific conversion, derive
 /// from this class and create a new calculate_beat_address() function
@@ -1479,64 +1620,6 @@ task dbb_slave_driver::read_response_reorder();
 
 endtask: read_response_reorder
 
-
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-//
-//                    WRITE ADDRESS CHANNEL
-//
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-// Interface functions for the state machine object.
-
-task dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::wait_clock();
-    @(driver.drv_if.sclk);
-endtask
-
-function void dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::drive_ready( logic value );
-    driver.drv_if.sclk.awready <= value;
-endfunction
-
-function logic dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::sample_valid();
-    return driver.drv_if.sclk.awvalid;
-endfunction
-
-function int dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::get_valid_ready_delay();
-    dbb_ctrl_ext active_wradd_txn_ctrl;
-    `CAST_DBB_EXT(,active_wradd_txn,ctrl)
-    return active_wradd_txn_ctrl.avalid_aready_delay;
-endfunction
-
-function int dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::get_ready_delay();
-    dbb_ctrl_ext active_wradd_txn_ctrl;
-    `CAST_DBB_EXT(,active_wradd_txn,ctrl)
-    return active_wradd_txn_ctrl.aready_delay;
-endfunction
-
-task dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::initiate_beat();
-    `uvm_info("DBB/SLV/DRV/WRADD/INITIATE_BEAT", "dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::initiate_beat", UVM_DEBUG)
-    driver.init_write_txn(active_wradd_txn);
-endtask
-
-task dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::beat_finished();
-    dbb_helper_ext active_wradd_txn_helper;
-    `CAST_DBB_EXT(,active_wradd_txn,helper)
-    `uvm_info("DBB/SLV/DRV/WRADD/INITIATE_BEAT", "dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::beat_finished", UVM_DEBUG)
-    driver.check_write_data_complete(active_wradd_txn);
-    `uvm_info("NVDLA/DBB/SLV/DRV/TXN_TRACE",{"\n",active_wradd_txn_helper.print(active_wradd_txn)},UVM_DEBUG);
-endtask
-
-`ifdef DRIVER_CALLBACKS
-function bit dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::do_backpressure_callback();
-    `uvm_do_obj_callbacks_exit_on(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks, driver,
-                                  awready_backpressure(driver, active_wradd_txn), 1)
-endfunction
-`endif
-
-task dbb_slave_driver::dbb_slave_driver_write_address_channel_sm::post_sm();
-    // Tell data channel that it's their turn to process
-    driver.write_address_channel_complete.put(1);
-endtask
 
 ////////////////////////////////////////////////////////////////////////////////
 /// When the write address channel detects a new write address, it calls
@@ -1784,7 +1867,7 @@ task dbb_slave_driver::drive_read_data_channel(uvm_tlm_gp tr);
 `ifdef DRIVER_CALLBACKS
     // Pre response callback
     `uvm_do_callbacks(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks,
-                      pre_response(this, tr));
+                      pre_response(/*this,*/ tr));
 `endif
 
     // Shift data into proper lane
@@ -1796,29 +1879,29 @@ task dbb_slave_driver::drive_read_data_channel(uvm_tlm_gp tr);
 `ifdef DRIVER_CALLBACKS
     // Post response callback
     `uvm_do_callbacks(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks,
-                      post_response(this, tr));
+                      post_response(/*this,*/ tr));
 `endif
 
 endtask: drive_read_data_channel
 
 //////////////////////////////////////////////////////////////////////
 /// Return proper read response, honoring any requested FORCEs.
-function dbb_ctrl_ext#()::resp_type_e dbb_slave_driver::get_read_response(uvm_tlm_gp tr);
+function dbb_ctrl_ext::resp_type_e dbb_slave_driver::get_read_response(uvm_tlm_gp tr);
     dbb_helper_ext tr_helper;
     `CAST_DBB_EXT(,tr,helper)
       
     case (tr_helper.status_err[tr_helper.n_data])
-      dbb_helper_ext#()::NO_FORCE:
+      dbb_helper_ext::NO_FORCE:
         // Return EXOKAY if exclusive was requested. We should already be monitoring this address.
-          get_read_response = dbb_ctrl_ext#()::OKAY;
-      dbb_helper_ext#()::FORCE_EXOKAY:
-        get_read_response = dbb_ctrl_ext#()::EXOKAY;
-      dbb_helper_ext#()::FORCE_SLVERR:
-        get_read_response = dbb_ctrl_ext#()::SLVERR;
-      dbb_helper_ext#()::FORCE_DECERR:
-        get_read_response = dbb_ctrl_ext#()::DECERR;
-      dbb_helper_ext#()::FORCE_OKAY:
-        get_read_response = dbb_ctrl_ext#()::OKAY;
+          get_read_response = dbb_ctrl_ext::OKAY;
+      dbb_helper_ext::FORCE_EXOKAY:
+        get_read_response = dbb_ctrl_ext::EXOKAY;
+      dbb_helper_ext::FORCE_SLVERR:
+        get_read_response = dbb_ctrl_ext::SLVERR;
+      dbb_helper_ext::FORCE_DECERR:
+        get_read_response = dbb_ctrl_ext::DECERR;
+      dbb_helper_ext::FORCE_OKAY:
+        get_read_response = dbb_ctrl_ext::OKAY;
     endcase
 
 endfunction: get_read_response
@@ -1848,69 +1931,6 @@ function void dbb_slave_driver::quiesce_read_data_channel();
 
 endfunction: quiesce_read_data_channel
 
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-//
-//                    WRITE DATA CHANNEL
-//
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-// Interface functions for the state machine object.
-
-task dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::wait_clock();
-    @(driver.drv_if.sclk);
-endtask
-
-function void dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::drive_ready( logic value );
-    driver.drv_if.sclk.wready <= value;
-endfunction
-
-function logic dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::sample_valid();
-    return driver.drv_if.sclk.wvalid;
-endfunction
-
-function int dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::get_valid_ready_delay();
-    dbb_ctrl_ext active_wrd_txn_ctrl;
-    dbb_helper_ext active_wrd_txn_helper;
-    `CAST_DBB_EXT(,active_wrd_txn,ctrl)
-    `CAST_DBB_EXT(,active_wrd_txn,helper)
-    return active_wrd_txn_ctrl.wvalid_wready_delay[active_wrd_txn_helper.n_data];
-endfunction
-
-function int dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::get_ready_delay();
-    dbb_ctrl_ext active_wrd_txn_ctrl;
-    dbb_helper_ext active_wrd_txn_helper;
-    `CAST_DBB_EXT(,active_wrd_txn,ctrl)
-    `CAST_DBB_EXT(,active_wrd_txn,helper)
-    return active_wrd_txn_ctrl.wready_delay[active_wrd_txn_helper.n_data];
-endfunction
-
-task dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::initiate_beat();
-    `uvm_info("DBB/SLV/DRV/WRDATA/INITIATE_BEAT", "dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::initiate_beat", UVM_DEBUG)
-    driver.find_write_txn_for_beat(active_wrd_txn);
-endtask
-
-task dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::beat_finished();
-    driver.write_beat_finished(active_wrd_txn);
-endtask
-
-`ifdef DRIVER_CALLBACKS
-function bit dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::do_backpressure_callback();
-    `uvm_do_obj_callbacks_exit_on(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks, driver,
-                                  wready_backpressure(driver, active_wrd_txn), 1)
-endfunction
-`endif
-
-task dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::pre_sm();
-    // Let write address channel complete first to make sure that address
-    // is handled before simultaneous data for that same transaction
-    driver.write_address_channel_complete.get();
-endtask
-
-task dbb_slave_driver::dbb_slave_driver_write_data_channel_sm::post_sm();
-    // Tell data channel that it's their turn to process
-    driver.write_data_channel_complete.put(1);
-endtask
 
 //////////////////////////////////////////////////////////////////////
 /// Samples write data off the bus. Also applies write strobes, unshifts it,
@@ -1956,7 +1976,7 @@ task dbb_slave_driver::sample_write_data(uvm_tlm_gp tr);
 
 `ifdef DRIVER_CALLBACKS
         `uvm_do_callbacks(dbb_slave_driver#(MEM_DATA_WIDTH), dbb_slave_driver_callbacks,
-                          skip_mem_write(this, tr, skip));
+                          skip_mem_write(/*this,*/ tr, skip));
 `endif
         if (!skip) begin
             // Now handle updating the memory. Since we could potentially not be storing all of the
@@ -2027,7 +2047,7 @@ task dbb_slave_driver::write_beat_finished(uvm_tlm_gp tr);
         // Call any callbacks that wanted notification that last write data beat
         // has arrived and tr is fully populated with write data
         `uvm_do_callbacks(dbb_slave_driver#(MEM_DATA_WIDTH), dbb_slave_driver_callbacks,
-                          post_write_data(this, tr));
+                          post_write_data(/*this,*/ tr));
 `endif
         // If the address is also over, time to hand over to write response phase
         if (tr_ctrl.ADDRESS_ENDED.is_on()) begin
@@ -2377,7 +2397,7 @@ function void dbb_slave_driver::drive_write_resp_channel(uvm_tlm_gp tr);
     // Pre Response Callback
 `ifdef DRIVER_CALLBACKS
     `uvm_do_callbacks(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks,
-                      pre_response(this, tr));
+                      pre_response(/*this,*/ tr));
 
 `endif
 
@@ -2389,28 +2409,28 @@ function void dbb_slave_driver::drive_write_resp_channel(uvm_tlm_gp tr);
     // Post Response Callback
 `ifdef DRIVER_CALLBACKS
     `uvm_do_callbacks(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks,
-                      post_response(this, tr));
+                      post_response(/*this,*/ tr));
 `endif
 
 endfunction: drive_write_resp_channel
    
 //////////////////////////////////////////////////////////////////////
 /// Return proper write response, honoring any requested FORCEs.
-function dbb_ctrl_ext#()::resp_type_e dbb_slave_driver::get_write_response(uvm_tlm_gp tr);
+function dbb_ctrl_ext::resp_type_e dbb_slave_driver::get_write_response(uvm_tlm_gp tr);
     dbb_helper_ext tr_helper;
     `CAST_DBB_EXT(,tr,helper)
       
     case (tr_helper.status_err[0])
-      dbb_helper_ext#()::NO_FORCE:
+      dbb_helper_ext::NO_FORCE:
           ;//calculate_excl_bresp(tr);
-      dbb_helper_ext#()::FORCE_EXOKAY:
-        get_write_response = dbb_ctrl_ext#()::EXOKAY;
-      dbb_helper_ext#()::FORCE_SLVERR:
-        get_write_response = dbb_ctrl_ext#()::SLVERR;
-      dbb_helper_ext#()::FORCE_DECERR:
-        get_write_response = dbb_ctrl_ext#()::DECERR;
-      dbb_helper_ext#()::FORCE_OKAY:
-        get_write_response = dbb_ctrl_ext#()::OKAY;
+      dbb_helper_ext::FORCE_EXOKAY:
+        get_write_response = dbb_ctrl_ext::EXOKAY;
+      dbb_helper_ext::FORCE_SLVERR:
+        get_write_response = dbb_ctrl_ext::SLVERR;
+      dbb_helper_ext::FORCE_DECERR:
+        get_write_response = dbb_ctrl_ext::DECERR;
+      dbb_helper_ext::FORCE_OKAY:
+        get_write_response = dbb_ctrl_ext::OKAY;
     endcase
 
 endfunction: get_write_response
@@ -2610,7 +2630,7 @@ task dbb_slave_driver::transaction_started(uvm_tlm_gp tr);
 
 `ifdef DRIVER_CALLBACKS
     `uvm_do_callbacks(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks,
-                      pre_trans(this, tr));
+                      pre_trans(/*this,*/ tr));
 `endif
 
     // Indicate that the transaction is starting
@@ -2646,7 +2666,7 @@ task dbb_slave_driver::transaction_finished(uvm_tlm_gp tr);
 
 `ifdef DRIVER_CALLBACKS
     `uvm_do_callbacks(dbb_slave_driver#(MEM_DATA_WIDTH),dbb_slave_driver_callbacks,
-                      post_trans(this, tr));
+                      post_trans(/*this,*/ tr));
 `endif
 
     // Remove from active transaction queue

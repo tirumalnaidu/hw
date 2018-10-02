@@ -60,7 +60,7 @@ endfunction: build_phase
 
 function void nvdla_sdprdma_sdp_scenario::trace_dump(int fh);
     surface_feature_config feature_cfg;
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

@@ -15,7 +15,7 @@
 #include "nvdla_scsv_sc_includes.h"
 
 // Including nvdla_top specific headers
-#ifndef __EDG__
+#if (!defined(__EDG__) || defined(MTI_SYSTEMC))
 #include "NV_nvdla.h"
 #endif
 
@@ -33,7 +33,7 @@ class nvdla_top_sc_adapter: public sc_module
     
     sc_out<bool > nvdla_top_sc2sv_nvdla_intr;  
 
-#ifndef __EDG__
+#if (!defined(__EDG__) || defined(MTI_SYSTEMC))
   //Instantiation of nvdla_top SystemC Module
   scsim::cmod::NV_nvdla *nvdla_top_sc_inst;
 

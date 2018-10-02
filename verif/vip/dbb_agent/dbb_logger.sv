@@ -9,7 +9,7 @@
 //////////////////////////////////////////////////////////////////////      
 //////////////////////////////////////////////////////////////////////      
 
-typedef class uvm_tlm_gp;
+//typedef class uvm_tlm_gp;
 
 /// nvdla DBB transaction logging class. This class utilizes the library nvdla
 /// logging class to implement an DBB transaction logger. A configuration bit
@@ -220,18 +220,18 @@ class dbb_logger#(int MEM_DATA_WIDTH=512) extends nvdla_txn_logger();
         // Shift data left if this happens to be an unaligned beat.
         //shift_lane_data = get_data_for_beat(tr,beatnum) << 8*misalignment_offset(tr, beatnum);
         get_bit_data_for_beat(tr, beatnum, shift_lane_data);
-        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:%#0x .. size:%#0x", shift_lane_data, tr_bus.get_size()), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:0x%0x .. size:0x%0x", shift_lane_data, tr_bus.get_size()), UVM_DEBUG)
         shift_lane_data <<= 8*misalignment_offset(tr, beatnum);
-        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:%#0x .. size:%#0x .. beatnum:%0d .. misalignment_offset:%0d", shift_lane_data, tr_bus.get_size(), beatnum, misalignment_offset(tr, beatnum)), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:0x%0x .. size:0x%0x .. beatnum:%0d .. misalignment_offset:%0d", shift_lane_data, tr_bus.get_size(), beatnum, misalignment_offset(tr, beatnum)), UVM_DEBUG)
         // Calculate data mask
         mask = (1 << number_bits) - 1;
-        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("mask:%#0x", mask), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("mask:0x%0x", mask), UVM_DEBUG)
         // Mask only the valid bits before driving onto bus, just to make sure
         // we don't try to drive too large of a data value.
         shift_lane_data &= mask;
         // Now shift into proper byte lane
         shift_lane_data <<= (byte_lane(tr,beatnum,dbus_width,number_bits) * number_bits);
-        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:%#0x .. bits:%0d", shift_lane_data, number_bits), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/SHIFT_LANE_DATA", $psprintf("busdata:0x%0x .. bits:%0d", shift_lane_data, number_bits), UVM_DEBUG)
     
     endfunction: shift_lane_data
     
@@ -300,7 +300,7 @@ class dbb_logger#(int MEM_DATA_WIDTH=512) extends nvdla_txn_logger();
         tr.get_data(original_data);
         `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT", $psprintf("starting_byte:%0d, bytes_per_beat:%0d, beatnum:%0d",starting_byte, bytes_per_beat, beatnum), UVM_DEBUG)
         for (i=0; i<bytes_per_beat; i++) begin
-          `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT", $psprintf("ret_data:%#0x, original_data:%#0x",ret_data[i*8+:8], original_data[starting_byte+i]), UVM_DEBUG)
+          `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT", $psprintf("ret_data:0x%0x, original_data:0x%0x",ret_data[i*8+:8], original_data[starting_byte+i]), UVM_DEBUG)
           ret_data[i*8+:8] = original_data[starting_byte+i];
         end
     endfunction : get_bit_data_for_beat

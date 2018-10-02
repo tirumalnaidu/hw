@@ -8,7 +8,7 @@
 // Core function of memory model.
 //-------------------------------------------------------------------------------------
 
-typedef class memory_model_command;
+//typedef class memory_model_command;
 typedef class surface_file_content;    
 typedef class surface_store_info;
 
@@ -117,11 +117,11 @@ function bit [1023:0] mem_core::read(bit [`MEM_ADDR_WIDTH-1:0] addr, bit [10:0] 
                 ADDR   : data = (addr+i) & 'hff;
             endcase
             rdata[8*i+7 -: 8] = data;
-            `uvm_info("MEM/RD", $sformatf("Read %#x from uninitialized addr %#0x", data, addr+i), UVM_FULL)
+            `uvm_info("MEM/RD", $sformatf("Read 0x%x from uninitialized addr 0x%0x", data, addr+i), UVM_FULL)
             if (!dont_store_uninitialized_vals)
                 write8(addr+i, data);
         end
-        `uvm_info("MEM/RD", $sformatf("Read %#2x from addr %#x", m_mem[addr+i], addr+i), UVM_FULL)        
+        `uvm_info("MEM/RD", $sformatf("Read 0x%2x from addr 0x%x", m_mem[addr+i], addr+i), UVM_FULL)        
     end
 
     return rdata;
@@ -173,7 +173,7 @@ function void mem_core::write(bit [`MEM_ADDR_WIDTH-1:0] addr, bit [1023:0] data,
     for (int i=0; i<num_bytes; i++) begin
         if (wstrb[i]) begin
             m_mem[addr+i] = data[8*i+7 -: 8];
-            `uvm_info("MEM/WR", $sformatf("Write %#2x to addr %#x", m_mem[addr+i], addr+i), UVM_FULL)
+            `uvm_info("MEM/WR", $sformatf("Write 0x%2x to addr 0x%x", m_mem[addr+i], addr+i), UVM_FULL)
         end
     end
 endfunction
@@ -240,7 +240,7 @@ function void mem_core::dump_surface(string filename,
     string q[$];
 
     `uvm_info("MEM/DUMP",
-        $sformatf("Dump surface stored in [%#x:%#x] to %s", base, base+len-1, filename), UVM_FULL)
+        $sformatf("Dump surface stored in [0x%x:0x%x] to %s", base, base+len-1, filename), UVM_FULL)
     
     fh = $fopen(filename, "w");
     if (!fh) `uvm_fatal("FILE/OPEN/FAILED", {"Open ", filename, " failed!"})
@@ -260,7 +260,7 @@ function void mem_core::dump_surface(string filename,
             segment_len = segment_end_offset - segment_start_offset;            
             num_payload = (segment_len%16 == 0) ? segment_len/16 : segment_len/16 + 1;
             `uvm_info("MEM/DUMP",
-                $sformatf("segment_start_offset = %#4x, segment_end_offset = %#4x, segment_len = %0d, num_payload = %0d",
+                $sformatf("segment_start_offset = 0x%4x, segment_end_offset = 0x%4x, segment_len = %0d, num_payload = %0d",
                 segment_start_offset, segment_end_offset, segment_len, num_payload), UVM_FULL)
 
             for (int payload_idx=0; payload_idx<num_payload; payload_idx++) begin
@@ -270,10 +270,10 @@ function void mem_core::dump_surface(string filename,
                     payload_size = 16;                    
 
                 q.push_back("  { ");
-                q.push_back($sformatf("offset:%#4x, size:%2d, payload:",
+                q.push_back($sformatf("offset:0x%4x, size:%2d, payload:",
                     segment_start_offset+16*payload_idx, payload_size));
                 repeat (payload_size)
-                    q.push_back($sformatf("%#2x ", segment_data.pop_front()));
+                    q.push_back($sformatf("0x%2x ", segment_data.pop_front()));
 
                 q.push_back("},\n");
             end
@@ -311,7 +311,7 @@ function void mem_core::init_surface_with_pattern(bit [`MEM_ADDR_WIDTH-1:0] base
             "FIVEA"  : data = 8'h5a;
             "ADDR"   : data = (base+i) & 'hff;
         endcase
-        `uvm_info(tID, $sformatf("Init %#x to addr %#0x", data, base+i), UVM_HIGH)
+        `uvm_info(tID, $sformatf("Init 0x%x to addr 0x%0x", data, base+i), UVM_HIGH)
         write8(base+i, data);
     end
 
@@ -347,7 +347,12 @@ endfunction
 //|  end
 
 function int unsigned mem_core::calc_surface_crc(bit [`MEM_ADDR_WIDTH-1:0] base, int len);
-    static const int unsigned crc32_table[] = {32'h00000000,32'h77073096,32'hee0e612c,32'h990951ba,
+`ifdef VCS
+   static const int unsigned crc32_table[] =
+`else
+   const var static int unsigned crc32_table[] =
+`endif
+					    {32'h00000000,32'h77073096,32'hee0e612c,32'h990951ba,
                                                32'h076dc419,32'h706af48f,32'he963a535,32'h9e6495a3,
                                                32'h0edb8832,32'h79dcb8a4,32'he0d5e91e,32'h97d2d988,
                                                32'h09b64c2b,32'h7eb17cbd,32'he7b82d07,32'h90bf1d91,
@@ -421,7 +426,7 @@ function int unsigned mem_core::calc_surface_crc(bit [`MEM_ADDR_WIDTH-1:0] base,
     if (0 != len%4)
         `uvm_error("CRC/CALC", $sformatf("length (%0d) is not multiple of 4", len))
 
-    `uvm_info("MEM/CRC", $sformatf("Calculate CRC32 of memory range [%#x:%#x]", base, base+len), UVM_FULL)
+    `uvm_info("MEM/CRC", $sformatf("Calculate CRC32 of memory range [0x%x:0x%x]", base, base+len), UVM_FULL)
     
     while (len >= 4) begin
         int unsigned d = mem_exists(addr) ? read32(addr) : 0;
@@ -445,7 +450,7 @@ function string mem_core::m_trimed_string(string str);
     
     // Strip front spaces and '{' in a str
     while (s[0] inside {" ", "\t", "\n", "{"})
-        s = s .substr(1);
+        s = s.substr(1, s.len()-1);
 
     // Strip tail spaces, '}' and ',' in a str
     while (s[s.len()-1] inside {" ", "\t", "\n", "}", ","})
@@ -461,7 +466,7 @@ function int mem_core::m_atov(string str);
 
     s = m_trimed_string(str);
     if (s.substr(0, 1) inside {"0x", "0X"})
-        val = s.substr(2).atohex();
+        val = s.substr(2, s.len()-1).atohex();
     else if (s.substr(0, 0) == "0")
         val = s.atooct();
     else
@@ -544,7 +549,7 @@ function void mem_core::m_parse_surface_file(string filename, output surface_fil
         content.start_offset = minq[0];
         content.end_offset = maxq[0] + 1;
         `uvm_info("PARSE/SURFACE_FILE",
-            $sformatf("start_offset = %#0x, end_offset = %#0x", content.start_offset, content.end_offset), UVM_FULL)
+            $sformatf("start_offset = 0x%0x, end_offset = 0x%0x", content.start_offset, content.end_offset), UVM_FULL)
     end
 
     $fclose(fh);        
@@ -578,7 +583,7 @@ class surface_store_info;
 
     function string convert2string();
         string   s;
-        s = $sformatf("Surface %0d: base = %#x, len = %0d", surface_id, base, len);
+        s = $sformatf("Surface %0d: base = 0x%x, len = %0d", surface_id, base, len);
         return s;
     endfunction
 endclass

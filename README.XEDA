@@ -1,0 +1,105 @@
+This file list all changes mandatory to run on Questa 10.4b
+
+So far based on "nv_small" as per September2018
+
+-No code beautification
+-Many issues because Questa more LRM strict than VCS
+-Kept backward compatibility in mind
+-Couple issues because of python/c versions
+-Some ugly Makefile twist to have right combo of gcc/cc/ldd/systemC/Questa
+
+questa: 10.4b
+python: 2.7 and 3 (per file...)
+systemc: 2.3.0
+gcc: gcc-4.7.4 (from Questa intall) + gcc-4.9.2 (from system)
+
+modified:  Makefile		Added SIM_PLATFORM flags for NCSIM and MTI, added $UVM_HOME and simulators HOMEs
+modified:  cmod/Makefile		Added SIM_PLATFORM flags for NCSIM and MTI
+modified:  cmod/nvdla_top/NV_nvdla.cpp		Added SC_MODULE_EXPORT to top level module (MTI requirement)
+modified:  third_party_tools/uvmc-2.3.0/src/connect/sv/uvmc_commands.sv		Casting/syntax for MTI compatibility
+modified:  tools/bin/epython		Edit for python 2.7 compatibility
+modified:  verif/coverage/nvdla_coverage_bdma.sv		Moved covergroup usage after definition
+modified:  verif/coverage/nvdla_coverage_cdp.sv		Moved covergroup usage after definition
+modified:  verif/coverage/nvdla_coverage_conv.sv		Moved covergroup usage after definition
+modified:  verif/coverage/nvdla_coverage_pdp.sv		Moved covergroup usage after definition
+modified:  verif/coverage/nvdla_coverage_pkg.sv		Added include of uvm_pkg/uvm_macros (needed for standalone package compilation)
+modified:  verif/coverage/nvdla_coverage_rubik.sv		Moved covergroup usage after definition
+modified:  verif/coverage/nvdla_coverage_sdp.sv		Moved covergroup usage after definition
+modified:  verif/ral/nvdla_ral_pkg.sv		Fixed includes for Questa : (vlog-2275) 'ordt_uvm_reg_pkg' already exists and will be overwritten.
+modified:  verif/ral/nvdla_reg_adapter.sv		Casting needed for Questa
+modified:  verif/testbench/trace_generator/Makefile		Added support for MTI; Added simulator-specific targets and variables based on SIM_PLATFORM check
+modified:  verif/testbench/trace_generator/env/nvdla_tg_common.svh		Include files for stand alone compilation
+modified:  verif/testbench/trace_generator/env/nvdla_tg_core.sv		Include files for stand alone compilation
+modified:  verif/testbench/trace_generator/env/nvdla_tg_top.sv		Include files for stand alone compilation
+modified:  verif/testbench/trace_generator/resources/nvdla_base_resource.sv		Replaced %# format by 0x%
+modified:  verif/testbench/trace_generator/resources/nvdla_cc_dp_resource.sv		null not an int; static qualifier in external definition
+modified:  verif/testbench/trace_generator/resources/nvdla_cdma_resource.sv		null not an int
+modified:  verif/testbench/trace_generator/resources/nvdla_cdp_rdma_resource.sv		null not an int
+modified:  verif/testbench/trace_generator/resources/nvdla_cdp_resource.sv		null not an int
+modified:  verif/testbench/trace_generator/resources/nvdla_pdp_rdma_resource.sv		null not an int
+modified:  verif/testbench/trace_generator/resources/nvdla_pdp_resource.sv		null not an int; static qualifier in external definition
+modified:  verif/testbench/trace_generator/resources/nvdla_rbk_resource.sv		null not an int
+modified:  verif/testbench/trace_generator/resources/nvdla_resource_pkg.sv		Include files for stand alone package compilation
+modified:  verif/testbench/trace_generator/resources/nvdla_sdp_rdma_resource.sv		null not an int; static qualifier in external definition
+modified:  verif/testbench/trace_generator/resources/nvdla_sdp_resource.sv		null not an int; static qualifier in external definition
+modified:  verif/testbench/trace_generator/scenarios/nvdla_cc_sdp_pdp_scenario.sv		null not an int
+modified:  verif/testbench/trace_generator/scenarios/nvdla_cc_sdp_scenario.sv		null not an int
+modified:  verif/testbench/trace_generator/scenarios/nvdla_cc_sdprdma_sdp_pdp_scenario.sv		null not an int
+modified:  verif/testbench/trace_generator/scenarios/nvdla_cc_sdprdma_sdp_scenario.sv		null not an int
+modified:  verif/testbench/trace_generator/scenarios/nvdla_cdprdma_cdp_scenario.sv		null not an int
+modified:  verif/testbench/trace_generator/scenarios/nvdla_pdprdma_pdp_scenario.sv		null not an int
+modified:  verif/testbench/trace_generator/scenarios/nvdla_scenario_pkg.sv		Include files for stand alone package compilation
+modified:  verif/testbench/trace_generator/scenarios/nvdla_sdprdma_sdp_pdp_scenario.sv		null not an int
+modified:  verif/testbench/trace_generator/scenarios/nvdla_sdprdma_sdp_scenario.sv		null not an int
+modified:  verif/testbench/trace_player/Makefile		Added SIM_PLATFORM flags for NCSIM and MTI, added $UVM_HOME and simulators HOMEs, added simulator-specific targets and variables
+deleted: verif/testbench/trace_player/nvdla_tb_common.svh		Replaced by nvdla_tb_common_defines.svh and nvdla_tb_common_pkg.sv
+modified:  verif/testbench/trace_player/nvdla_tb_intr_handler.sv		act_id & exp_id type changed from bit to int + added atoi() after substr() call
+modified:  verif/testbench/trace_player/nvdla_tb_scoreboard.sv		Fix for Questa (vlog-2898) A dynamic or automatic var. reference (this) is not allowed here, possibly more efficient loop; Remove forward declaration
+modified:  verif/testbench/trace_player/nvdla_tb_top.sv		Added includes and imports here instead of putting them on the command line; Added wave dumping for Questa
+modified:  verif/testbench/trace_player/nvdla_tb_trace_parser.sv		Specify mem_pkg scope for some types
+modified:  verif/testbench/trace_player/nvdla_tb_txn.sv		All type definitions moved to nvdla_tb_types.svh,  result_checker_command moved to mem_pkg (mem_command.sv) where it is needed and used., memory_model_command moved to mem_pkg (mem_command.sv) where it is needed and used. (needed for standalone package compilation)
+modified:  verif/tests/uvm_tests/nvdla_test_suite.sv		Include files for stand alone compilation
+modified:  verif/tests/uvm_tests/nvdla_user_define_demo_test.sv		Include files for stand alone compilation
+modified:  verif/tools/surface_generator/surface_generator.py		Explicitly use Python3 (code not compatible with Python2)
+modified:  verif/vip/cc_agent/cc_coverage.sv		Fixed parameterized classes usage
+modified:  verif/vip/cc_agent/cc_monitor.sv		Removed forward declarations, fixed parameterized classes usage
+modified:  verif/vip/cc_agent/cc_pkg.sv		Added UVM include for stand alone package compilation
+modified:  verif/vip/cc_agent/cc_txn.sv		new should not be done at declaration time
+modified:  verif/vip/csb_agent/csb_pkg.sv		Added UVM include for stand alone package compilation
+modified:  verif/vip/dbb_agent/dbb_defines.svh		dbb_*_ext are not parameterized, remove #()
+modified:  verif/vip/dbb_agent/dbb_gp_ext.sv		dbb_*_ext are not parameterized, remove #(), replaced %# format by 0x%
+modified:  verif/vip/dbb_agent/dbb_logger.sv		Removed forward declarations; replaced %# format by 0x%
+modified:  verif/vip/dbb_agent/dbb_monitor.sv		Replaced %# format by 0x%
+modified:  verif/vip/dbb_agent/dbb_pkg.sv		Re-ordered include directives
+modified:  verif/vip/dbb_agent/dbb_slave_agent.sv		Modified virtual interface syntax for compatibility with Questa; dbb_bus_object is not parameterized
+modified:  verif/vip/dbb_agent/dbb_slave_driver.sv		Removed forward declarations; replaced %# format by 0x%; removed protected scope for functions used from outside the class; removed redundant argument in callbacks causing circular class references; moved external function definitions of channel access classes inside driver (nested) so they are in the same scope as their class definition; removed #() when referencing un-parameterized classes; fixed config_db access for slave if. (IEEE1800-2009, p.144, An out-of-block declaration shall be declared in the same scope)
+modified:  verif/vip/dma_agent/dma_pkg.sv		Added UVM include for stand alone package compilation
+modified:  verif/vip/dp_agent/dp_monitor.sv		Questa does not support using a parameter as a slice_size in {<<slice_size{}} operator
+modified:  verif/vip/dp_agent/dp_pkg.sv		Added UVM include for stand alone package compilation
+modified:  verif/vip/mem_man/mem_domain.svh		Need to specify a range for packed dimensions [`MEM_ADDR_SIZE_MAX-1:0] vs [`MEM_ADDR_SIZE_MAX]
+modified:  verif/vip/mem_man/mem_man.svh		'static' keyword not needed/allowed in external definition
+modified:  verif/vip/mem_man/mem_man_pkg.sv		Added UVM include for stand alone package compilation
+modified:  verif/vip/mem_man/mem_region.svh		Replaced %# format by 0x%
+modified:  verif/vip/mem_model/mem_core.svh		LRM compliance syntax editions; Remove forward declarations; %# format is not defined in SV; fixed substr() arguments; fixed crc32_table[] type according to SV LRM
+modified:  verif/vip/mem_model/mem_pkg.sv		Side effect of changes in nvdla_tb_txn.sv, nvdla_tb_types.svh and mem_command.sv
+modified:  verif/vip/mem_model/mem_wrap.svh		LRM compliance syntax editions; Remove forward declarations; %# format is not defined in SV
+modified:  verif/vip/reference_model/nvdla_cmod_wrap/Makefile		Added support for MTI (10.4b only); Added simulator-specific targets and variables based on SIM_PLATFORM check
+modified:  verif/vip/reference_model/nvdla_scsv/sc/nvdla_scsv_sc_includes.h		__EDG__
+modified:  verif/vip/reference_model/nvdla_top_scsv_adapter/sc/nvdla_top_sc_adapter.cpp		Added SC_MODULE_EXPORT to top level module (MTI requirement)
+modified:  verif/vip/reference_model/nvdla_top_scsv_adapter/sc/nvdla_top_sc_adapter.h		__EDG__
+modified:  verif/vip/reference_model/nvdla_top_scsv_adapter/sc/nvdla_top_sc_layer.h		__EDG__
+modified:  verif/vip/reference_model/nvdla_top_scsv_adapter/sv/nvdla_top_sv_tlm_callbacks.svh		Added UVM include for stand alone package compilation
+modified:  verif/vip/reference_model/rm_nvdla_top/rm_nvdla_top_pkg.sv		Include nvdla_tb_common_defines to get `DMA_DATA_WIDTH derived from project.vh, may need to be revised; Added UVM include for stand alone package compilation
+modified:  verif/vip/surface_generator/surface_generator_pkg.sv		Added UVM include for stand alone package compilation
+modified:  vmod/compile_lint/Makefile		Added missing include; Added simulator-specific targets and variables based on SIM_PLATFORM check
+		
+Untracked files:		
+(use "git add <file>..." to include in what will be committed)		
+		
+modelsim.ini		Added central config file for Questa
+verif/testbench/trace_player/nvdla_tb_common_defines.svh		Part1 of split in 2 files : verif/testbench/trace_player/nvdla_tb_common.svh
+verif/testbench/trace_player/nvdla_tb_common_pkg.sv		Part2 of split in 2 files : verif/testbench/trace_player/nvdla_tb_common.svh
+verif/testbench/trace_player/nvdla_tb_types.svh		Added because of verif/testbench/trace_player/nvdla_tb_txn.sv cleanup, now contains only type definitions and TB specific transactions (not memory model transactions)
+verif/vip/mem_model/mem_command.sv		Added because of verif/testbench/trace_player/nvdla_tb_txn.sv cleanup, now contains classes memory_model_command and result_checker_command
+
+

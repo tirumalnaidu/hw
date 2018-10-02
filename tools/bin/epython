@@ -4,7 +4,11 @@ import os
 import sys
 import argparse
 import re
-import io
+
+if sys.version_info[0] == 2 and sys.version_info[1] == 7:
+    from io import BytesIO as StringIO
+else:
+    import io
 
 __DESCRIPTION__ = '''
 =====================================
@@ -149,7 +153,10 @@ class ProcessFile:
         hdl.write('%0s//:) epython: generated_end (DO NOT EDIT ABOVE)\n' % self._indent)
 
     def exe_python(self, scripts):
-        myout = io.StringIO()
+        if sys.version_info[0] == 2 and sys.version_info[1] == 7:
+            myout = StringIO()
+        else:
+            myout = io.StringIO()
         sys.stdout = myout
         exec(scripts)
         sys.stdout = sys.__stdout__

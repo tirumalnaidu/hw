@@ -87,6 +87,13 @@ NV_nvdla::NV_nvdla( sc_module_name module_name, uint8_t id, bool sctb_args )
 #endif
 // For reference model usage, end
 }
+
+#ifdef MTI_SYSTEMC
+SC_MODULE_EXPORT(NV_nvdla);
+#elif NCSC
+NCSC_MODULE_EXPORT(NV_nvdla);
+#endif
+
 #pragma CTC SKIP
 NV_nvdla::~NV_nvdla()
 {

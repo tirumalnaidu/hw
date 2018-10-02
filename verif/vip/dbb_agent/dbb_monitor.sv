@@ -281,18 +281,18 @@ class dbb_monitor#(int MEM_DATA_WIDTH=512) extends uvm_monitor;
         // We need to make sure we mask this, just in case the data bus is driving
         // values on the other lanes.
         mask = (1 << number_bits) - 1;
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("mask:%#0x", mask), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("mask:0x%0x", mask), UVM_DEBUG)
     
         // Shift out of the appropriate lane
         unshift_lane_data = busdata >> (byte_lane(tr,beatnum,dbus_width,number_bits) * number_bits);
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("byte_lane:%#0x", byte_lane(tr,beatnum,dbus_width,number_bits)), UVM_DEBUG)
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:%#0x", unshift_lane_data), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("byte_lane:0x%0x", byte_lane(tr,beatnum,dbus_width,number_bits)), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:0x%0x", unshift_lane_data), UVM_DEBUG)
         // Apply the mask
         unshift_lane_data &= mask;
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:%#0x", unshift_lane_data), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:0x%0x", unshift_lane_data), UVM_DEBUG)
         // Now shift even further if unaligned access
         unshift_lane_data >>= 8*misalignment_offset(tr, beatnum);
-        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:%#0x", unshift_lane_data), UVM_DEBUG)
+        `uvm_info("DBB_HELPER_EXT/UNSHIFT_LANE_DATA", $psprintf("unshift_lane_data:0x%0x", unshift_lane_data), UVM_DEBUG)
     
     endfunction: unshift_lane_data
     function void set_bit_data_for_beat(ref uvm_tlm_gp tr, int beatnum, bit [MEM_DATA_WIDTH-1:0] data);
@@ -316,9 +316,9 @@ class dbb_monitor#(int MEM_DATA_WIDTH=512) extends uvm_monitor;
     
         `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT", $psprintf("starting_byte:%0d, bytes_per_beat:%0d, beatnum:%0d",starting_byte, bytes_per_beat, beatnum), UVM_DEBUG)
         for (i=0; i<bytes_per_beat; i++) begin
-            `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT/BEFORE", $psprintf("set_data:%#0x, original_data:%#0x, i:%0d",data[i*8+:8], original_data[starting_byte+i],i), UVM_DEBUG)
+            `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT/BEFORE", $psprintf("set_data:0x%0x, original_data:0x%0x, i:%0d",data[i*8+:8], original_data[starting_byte+i],i), UVM_DEBUG)
             original_data[starting_byte+i] = data[i*8+:8];
-            `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT/AFTER", $psprintf("set_data:%#0x, original_data:%#0x, new_size:%0d",data[i*8+:8], original_data[starting_byte+i], original_data.size()), UVM_DEBUG)
+            `uvm_info("DBB_HELPER_EXT/GET_BIT_DATA_FOR_BEAT/AFTER", $psprintf("set_data:0x%0x, original_data:0x%0x, new_size:%0d",data[i*8+:8], original_data[starting_byte+i], original_data.size()), UVM_DEBUG)
         end
         tr.set_data(original_data);
         tr.set_data_length(original_data.size()); // necessary

@@ -51,13 +51,13 @@ class mem_domain extends uvm_report_object;
 
     extern local function string get_unique_name(string old_name);
 
-    extern local function bit [`MEM_ADDR_SIZE_MAX]
-        find_aligned_addr_abovebase(bit [`MEM_ADDR_SIZE_MAX] base,
-                                    bit [`MEM_ADDR_SIZE_MAX] align_mask);
+    extern local function bit [`MEM_ADDR_SIZE_MAX-1:0]
+        find_aligned_addr_abovebase(bit [`MEM_ADDR_SIZE_MAX-1:0] base,
+                                    bit [`MEM_ADDR_SIZE_MAX-1:0] align_mask);
 
-    extern local function bit [`MEM_ADDR_SIZE_MAX]
-        find_aligned_addr_belowbase(bit [`MEM_ADDR_SIZE_MAX] base,
-                                    bit [`MEM_ADDR_SIZE_MAX] align_mask);
+    extern local function bit [`MEM_ADDR_SIZE_MAX-1:0]
+        find_aligned_addr_belowbase(bit [`MEM_ADDR_SIZE_MAX-1:0] base,
+                                    bit [`MEM_ADDR_SIZE_MAX-1:0] align_mask);
 
     extern function mem_region
         find_region_in_freelist(bit [`MEM_ADDR_SIZE_MAX-1:0] rgnbase,
@@ -99,7 +99,7 @@ function mem_domain::new(string name,
 
     if (limit < base)
         `uvm_fatal(tID,
-            $sformatf("limit (%#0x) is lower than base (%#0x) for domain %s",
+            $sformatf("limit (0x%0x) is lower than base (0x%0x) for domain %s",
             limit, base, name))
 
     this.base = base;
@@ -118,10 +118,10 @@ mem_domain::request_region_by_size(string region_name,
     mem_region new_region;
 
     alignedbase = search_for_free_space(size, align_mask);
-    `uvm_info(tID, $sformatf("request_region_by_size: size = %#x, align_mask = %#x", size, align_mask), UVM_HIGH)
+    `uvm_info(tID, $sformatf("request_region_by_size: size = 0x%x, align_mask = 0x%x", size, align_mask), UVM_HIGH)
     if (alignedbase == -1) begin
         `uvm_fatal(tID,
-            $sformatf("request_region: Not enough contiguous space available to reserve region size=%#0x, align_mask=%#0x for region %s.\n %s",
+            $sformatf("request_region: Not enough contiguous space available to reserve region size=0x%0x, align_mask=0x%0x for region %s.\n %s",
             size, align_mask, region_name, convert2string()));
         return null;
     end
@@ -210,7 +210,7 @@ mem_domain::search_for_free_space(bit [`MEM_ADDR_SIZE_MAX-1:0] size,
             };
             if (!success) `uvm_fatal(tID, "std::randomize(aligned_addr) failed!")
             `uvm_info(tID,
-                $sformatf("search_for_free_space: possible_regions[0].base = %#x, possible_regions[0].limit = %#x, aligned_addr = %#x, size = %#x, align_mask = %#x",
+                $sformatf("search_for_free_space: possible_regions[0].base = 0x%x, possible_regions[0].limit = 0x%x, aligned_addr = 0x%x, size = 0x%x, align_mask = 0x%x",
                 possible_regions[0].base, possible_regions[0].limit, aligned_addr, size, align_mask), UVM_HIGH)
         end
 
@@ -219,7 +219,7 @@ mem_domain::search_for_free_space(bit [`MEM_ADDR_SIZE_MAX-1:0] size,
                 $sformatf("Invalid allocation policy (%s)", alloc_policy.name()))
     endcase
     `uvm_info(tID,
-        $sformatf("[%#0x:%#0x] is allocated from [%#0x:%#0x]",
+        $sformatf("[0x%0x:0x%0x] is allocated from [0x%0x:0x%0x]",
             aligned_addr, aligned_addr+size, possible_regions[0].base, possible_regions[0].limit), UVM_HIGH)
 
     return aligned_addr;
@@ -234,10 +234,10 @@ mem_domain::reserve_region(string region_name,
 
     if (limit < base) begin
         `uvm_fatal(tID,
-            $sformatf("limit (%#0x) is lower than base(%#0x) for %s.",
+            $sformatf("limit (0x%0x) is lower than base(0x%0x) for %s.",
             limit, base, region_name))
     end
-    `uvm_info(tID, $sformatf("reserve_region: base = %#x, limit = %#x", base, limit), UVM_HIGH)
+    `uvm_info(tID, $sformatf("reserve_region: base = 0x%x, limit = 0x%x", base, limit), UVM_HIGH)
 
     if (! check_domain_bounds(base, limit)) return null;
 
@@ -245,7 +245,7 @@ mem_domain::reserve_region(string region_name,
     new_region  = allocate_region(region_name, base, limit);
     if (new_region == null) begin
         `uvm_fatal(tID,
-            $sformatf("Unable to reserve region '%s' with base=%#0x, limit=%#0x\n%s",
+            $sformatf("Unable to reserve region '%s' with base=0x%0x, limit=0x%0x\n%s",
             region_name,  base, limit, convert2string()));
          return null;
     end
@@ -253,14 +253,14 @@ mem_domain::reserve_region(string region_name,
     foreach (region_list[iter]) begin
         if (new_region.overlaps(region_list[iter])) begin
             `uvm_fatal(tID,
-                $sformatf("Unable to reserve region '%s' with base=%#0x, limit=%#0x\n%s",
+                $sformatf("Unable to reserve region '%s' with base=0x%0x, limit=0x%0x\n%s",
                 region_name, base, limit, convert2string()))
             return null;
         end
     end
 
     `uvm_info(tID,
-        $sformatf("Reserved region '%s' with base=%#0x, limit=%#0x",
+        $sformatf("Reserved region '%s' with base=0x%0x, limit=0x%0x",
         region_name, new_region.base, new_region.limit),
         UVM_HIGH);
 
@@ -337,15 +337,15 @@ mem_domain::get_unique_name(string old_name);
     return new_name;
 endfunction
 
-function bit [`MEM_ADDR_SIZE_MAX]
-mem_domain::find_aligned_addr_abovebase(bit [`MEM_ADDR_SIZE_MAX] base,
-                                        bit [`MEM_ADDR_SIZE_MAX] align_mask);
+function bit [`MEM_ADDR_SIZE_MAX-1:0]
+mem_domain::find_aligned_addr_abovebase(bit [`MEM_ADDR_SIZE_MAX-1:0] base,
+                                        bit [`MEM_ADDR_SIZE_MAX-1:0] align_mask);
     return (base + align_mask) & ~align_mask;
 endfunction
 
-function bit [`MEM_ADDR_SIZE_MAX]
-mem_domain::find_aligned_addr_belowbase(bit [`MEM_ADDR_SIZE_MAX] base,
-                                        bit [`MEM_ADDR_SIZE_MAX] align_mask);
+function bit [`MEM_ADDR_SIZE_MAX-1:0]
+mem_domain::find_aligned_addr_belowbase(bit [`MEM_ADDR_SIZE_MAX-1:0] base,
+                                        bit [`MEM_ADDR_SIZE_MAX-1:0] align_mask);
     return base & ~align_mask;
 endfunction
 
@@ -371,14 +371,14 @@ mem_domain::check_domain_bounds(bit [`MEM_ADDR_SIZE_MAX-1:0] base,
 
     if (base < this.base) begin
         `uvm_fatal(tID,
-            $sformatf("Requested base address (%#0x) is lower than the base address for this mem_domain (%#0x)",
+            $sformatf("Requested base address (0x%0x) is lower than the base address for this mem_domain (0x%0x)",
             base, this.base))
         return 0;
     end
 
     if (limit > this.limit) begin
         `uvm_fatal(tID,
-            $sformatf("Requested limit address (%#0x) is higher than the limit address for this mem_domain (%#0x)",
+            $sformatf("Requested limit address (0x%0x) is higher than the limit address for this mem_domain (0x%0x)",
             limit, this.limit))
         return 0;
     end

@@ -29,7 +29,7 @@ class cc_txn #(int DW = 1, int MW = 1) extends uvm_sequence_item;
 //  rand bit                         batch_end;
     rand bit                         layer_end;
     rand bit [MW-1:0]                mask;
-    rand bit [DW-1:0]                data[] = new[MW];
+    rand bit [DW-1:0]                data[]/* = new[MW]*/;
     rand bit [`CC_SEL_WIDTH-1:0]     wt_sel;            // used only for sc2mac_wt
     bit                              conv_mode;         // only used for cmac2cacc
     bit [1:0]                        proc_precision;    // only used for cmac2cacc
@@ -80,7 +80,8 @@ class cc_txn #(int DW = 1, int MW = 1) extends uvm_sequence_item;
     //--------------------------------------------------------------------------------
     
     function new(string name = "cc_txn");
-        super.new(name);
+       super.new(name);
+       data = new[MW];       
     endfunction:new
 
     virtual function bit is_read();

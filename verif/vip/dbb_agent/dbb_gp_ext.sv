@@ -232,7 +232,7 @@ class dbb_ctrl_ext extends uvm_tlm_extension#(dbb_ctrl_ext);
 
     constraint c_resp_okay {
         foreach(resp[idx]) {
-            resp[idx] == dbb_ctrl_ext#()::OKAY;
+            resp[idx] == dbb_ctrl_ext::OKAY;
         }
     }
 endclass : dbb_ctrl_ext
@@ -719,7 +719,7 @@ function void dbb_helper_ext::pre_send_checks(uvm_tlm_gp tr);
     end
     foreach (wstrb[i]) begin
         if (wstrb[i] != 8'h00 && wstrb[i] != 8'hff) begin
-            `uvm_error("DBB_GP_EXT", $psprintf("byte_enable index has value other than 0 or ff, i:%0d en:%#0x", i, wstrb[i]))
+            `uvm_error("DBB_GP_EXT", $psprintf("byte_enable index has value other than 0 or ff, i:%0d en:0x%0x", i, wstrb[i]))
             errors++;
         end
     end
@@ -735,7 +735,7 @@ function string dbb_helper_ext::print(uvm_tlm_gp tr);
     dbb_ctrl_ext tr_ctrl;
     dbb_mon_ext tr_mon;
 
-    `uvm_info("DBB/TXN/GP/PRINT", $psprintf("kind:%s, addr:%#0x, data_length:%0d, byte_enable_length:%0d, is_dmi_allowed:%0d, is_response_ok:%0d, is_response_err:%0d, get_response_string:%s", tr.is_write()?"W":"R", tr.get_address(), tr.get_data_length(), tr.get_byte_enable_length(), tr.is_dmi_allowed(), tr.is_response_ok(), tr.is_response_error(), tr.get_response_string()), UVM_FULL)
+    `uvm_info("DBB/TXN/GP/PRINT", $psprintf("kind:%s, addr:0x%0x, data_length:%0d, byte_enable_length:%0d, is_dmi_allowed:%0d, is_response_ok:%0d, is_response_err:%0d, get_response_string:%s", tr.is_write()?"W":"R", tr.get_address(), tr.get_data_length(), tr.get_byte_enable_length(), tr.is_dmi_allowed(), tr.is_response_ok(), tr.is_response_error(), tr.get_response_string()), UVM_FULL)
 
     `uvm_info("DBB/TXN/HELPER/PRINT", $psprintf("n_data:%0d, stream_id:%0d, txn_num:%0d, my_txn_num:%0d, write_before_addr:%0d", n_data, stream_id, txn_num, my_txn_num, write_before_addr), UVM_FULL)
 

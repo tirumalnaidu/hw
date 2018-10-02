@@ -1,12 +1,13 @@
 `ifndef _MEM_WRAP_SVH_
 `define _MEM_WRAP_SVH_
 
+/*
 // TO REMOVE BEGIN
 typedef class memory_model_command;
 typedef class result_checker_command;
 
 // TO REMOVE END
-
+*/
 class mem_wrap extends uvm_component;
 
     typedef uvm_tlm_generic_payload gp_t;
@@ -92,7 +93,7 @@ function void mem_wrap::extract_phase(uvm_phase phase);
         `uvm_info("EXTRACT_PHASE", "Start to dump surface data automatically ...", UVM_LOW)
         foreach (mem.ssi_queue[i]) begin
             ssi = mem.ssi_queue[i];
-            filename = $sformatf("dump_surface_%s_%0d_base_%#x.dat", tID, ssi.surface_id, ssi.base);
+            filename = $sformatf("dump_surface_%s_%0d_base_0x%x.dat", tID, ssi.surface_id, ssi.base);
             mem.dump_surface(filename, ssi.base, ssi.len);
         end
     end
@@ -171,10 +172,10 @@ task mem_wrap::m_process_result_checker_command();
                 actual_crc = mem.calc_surface_crc(tr.base_address, tr.size);
                 if (actual_crc != tr.golden_crc)
                     `uvm_error("CRC_MISMATCH",
-                        $sformatf("Golden CRC = %#0x, Actual CRC = %#0x, RCC is: \n%s", tr.golden_crc, actual_crc, tr.sprint()))
+                        $sformatf("Golden CRC = 0x%0x, Actual CRC = 0x%0x, RCC is: \n%s", tr.golden_crc, actual_crc, tr.sprint()))
                 else
                     `uvm_info("CRC_MATCH",
-                        $sformatf("CRC (%#0x) Match with golden, RCC is \n%s", actual_crc, tr.sprint()), UVM_NONE)
+                        $sformatf("CRC (0x%0x) Match with golden, RCC is \n%s", actual_crc, tr.sprint()), UVM_NONE)
             end
 
             CHECK_FILE: begin

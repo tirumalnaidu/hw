@@ -8,8 +8,10 @@ OUT_DIR = $(TOT)/$(OUTDIR)/$(PROJECT)/$(REL_PATH_FROM_TOT)
 include ../../tree.make
 
   VCS_EXECUTABLE    := $(OUT_DIR)/simv
+  MTI_EXECUTABLE    := $(OUT_DIR)/simv
 
   export VCS_CC     := $(CXX)
+  export MTI_CC     := $(CXX)
 
 
 QUIET	:= @
@@ -48,6 +50,7 @@ VMOD_SRCDIR_LIST    := ${VMOD_DIR}/nvdla \
 						${VMOD_DIR}/nvdla/glb \
 						${VMOD_DIR}/nvdla/csb_master \
 						${VMOD_DIR}/nvdla/nocif \
+						${VMOD_DIR}/nvdla/cfgrom \
 						${VMOD_DIR}/nvdla/top
 
 ifdef NVDLA_PDP_ENABLE
@@ -109,6 +112,7 @@ DUT_DEFINE_ARGS	 := $(DUT_DEFINE_LIST:%=+define+%)
 VCS_TIMING_ARGS  := +nospecify +notimingchecks +define+VLIB_NO_UDP
 VCS_OK_WARNINGS  := +warn=noTFIPC +warn=noTMR
 VCS_64BIT_ARGS   := -full64
+MTI_64BIT_ARGS   := -64
 
 VCS_ARGS     := ${VCS_TIMING_ARGS} \
 		${VCS_OK_WARNINGS} \
@@ -125,19 +129,59 @@ VCS_ARGS     := ${VCS_TIMING_ARGS} \
 		+error+${MAX_ERROR_NUM} \
 		-debug_all
 
+MTI_VLOG_ARGS   := ${MTI_TIMING_ARGS} \
+		${MTI_OK_WARNINGS} \
+		${MTI_64BIT_ARGS} \
+		${DUT_ARGS} \
+		${DUT_DEFINE_ARGS} \
+		-work $(OUT_DIR)/work \
+		-sv \
+		-svfilesuffix=sv,svi,svh,svt \
+		+libext+.v \
+		+libext+.sv \
+		-timescale=1ns/1ns \
+		+error+${MAX_ERROR_NUM}
 
+MTI_SCCOM_ARGS  := -work $(OUT_DIR)/work \
+
+ifeq ($(SIM_PLATFORM),vcs)
 COMPILELOG   := ${VCS_EXECUTABLE}.compile.log
+endif
+
+ifeq ($(SIM_PLATFORM),mti)
+COMPILELOG   := $(OUT_DIR).compile.log
+endif
 ############################# Build targets ############################
 
-build :
+ifeq ($(SIM_PLATFORM),vcs)
+build: build_vcs
+endif
+
+ifeq ($(SIM_PLATFORM),mti)
+build: build_mti
+endif
+
+build_vcs:
 	${QUIET}${ECHO} "OUT_DIR = ${OUT_DIR}"
 	${MKDIR} -p $(OUT_DIR)
 	${LSF_COMMAND} $(VCS_HOME)/bin/vcs  -Xddg=0x1 -o ${VCS_EXECUTABLE} -cpp ${VCS_CC} ${VCS_ARGS}   -l ${COMPILELOG} ${DUT_DEFINES}  -Mdir=${VCS_EXECUTABLE}Csrc
 
+build_mti :
+	${QUIET}${ECHO} "OUT_DIR = ${OUT_DIR}"
+	${MKDIR} -p $(OUT_DIR)
+	${LSF_COMMAND} $(MTI_HOME)/bin/vlog ${MTI_VLOG_ARGS} -l ${COMPILELOG} ${DUT_DEFINES}
+
 default: all
 
+ifeq ($(SIM_PLATFORM),vcs)
 check:
-	${ORIGIN_DIR}/checkcompile.pl ${COMPILELOG} ${VCS_EXECUTABLE}
+	${ORIGIN_DIR}/checkcompile.pl ${COMPILELOG} ${MTI_EXECUTABLE}
+endif
+
+ifeq ($(SIM_PLATFORM),mti)
+check:
+	@echo "Target" $@ "not implemented for" $(SIM_PLATFORM)
+endif
 
 all: build check
 

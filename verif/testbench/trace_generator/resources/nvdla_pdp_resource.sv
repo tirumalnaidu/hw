@@ -206,7 +206,7 @@ function nvdla_pdp_resource::new(string name="nvdla_pdp_resource", uvm_component
     `uvm_info(inst_name, $sformatf("Initialize resource %s ... ",inst_name),UVM_LOW);
 endfunction: new
 
-static function nvdla_pdp_resource nvdla_pdp_resource::get_pdp(uvm_component parent);
+function nvdla_pdp_resource nvdla_pdp_resource::get_pdp(uvm_component parent);
     if (null == inst) begin
         inst = nvdla_pdp_resource::type_id::create("NVDLA_PDP", parent);
     end
@@ -214,7 +214,7 @@ static function nvdla_pdp_resource nvdla_pdp_resource::get_pdp(uvm_component par
 endfunction: get_pdp
 
 function void nvdla_pdp_resource::trace_dump(int fh);
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

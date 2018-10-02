@@ -42,7 +42,7 @@ endclass
 
 /* public functions */
 
-static function
+function
 mem_man mem_man::get_mem_man();
     if (inst == null)
         inst = new();
@@ -59,7 +59,7 @@ mem_man::register_domain(string domain_name,
         mem_domain tmp_domain = new(domain_name, base, limit, alloc_policy);
         domains[domain_name] = tmp_domain;
         `uvm_info(tID,
-            $sformatf("Creating new mem_domain %s: base=%#0x, limit=%#0x, alloc_policy=%s",
+            $sformatf("Creating new mem_domain %s: base=0x%0x, limit=0x%0x, alloc_policy=%s",
                 domain_name, base, limit, alloc_policy.name()), UVM_LOW)
     end
 

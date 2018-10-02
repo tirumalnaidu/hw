@@ -126,7 +126,7 @@ function nvdla_pdp_rdma_resource::new(string name="nvdla_pdp_rdma_resource", uvm
 endfunction: new
 
 function void nvdla_pdp_rdma_resource::trace_dump(int fh);
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

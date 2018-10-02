@@ -244,7 +244,7 @@ function nvdla_sdp_rdma_resource::new(string name="nvdla_sdp_rdma_resource", uvm
     `uvm_info(inst_name, $sformatf("Initialize resource %s ... ",inst_name),UVM_LOW);
 endfunction: new
 
-static function  nvdla_sdp_rdma_resource nvdla_sdp_rdma_resource::get_sdp_rdma(uvm_component parent);
+function  nvdla_sdp_rdma_resource nvdla_sdp_rdma_resource::get_sdp_rdma(uvm_component parent);
     if (null == inst) begin
         inst = new("NVDLA_SDP_RDMA", parent);
     end
@@ -380,7 +380,7 @@ function void nvdla_sdp_rdma_resource::surface_dump(int fh);
 endfunction: surface_dump
 
 function void nvdla_sdp_rdma_resource::trace_dump(int fh);
-    if(fh==null) begin
+    if(fh==0) begin
         `uvm_fatal(inst_name, "Null handle of trace file ...")
     end
     `uvm_info(inst_name, "Start trace dumping ...", UVM_HIGH)

@@ -41,6 +41,7 @@ COVERAGE_DIR         := ${TOT}/verif/coverage
 TRACE_GEN_ENV_DIR    := ${TOT}/verif/testbench/trace_generator/env
 TRACE_GEN_RES_DIR    := ${TOT}/verif/testbench/trace_generator/resources
 TRACE_GEN_SCE_DIR    := ${TOT}/verif/testbench/trace_generator/scenarios
+UVM_DIR              := ${UVM_HOME}
 
 ## =========================================================================================
 ## Setting log file name variables
@@ -68,18 +69,18 @@ VERIF_FILES := \
                ${MANUAL_DIR}/ordt_uvm_reg_pkg.sv \
                ${RAL_DIR}/nvdla_ral_pkg.sv \
                ${VIP_CSB_DIR}/csb_pkg.sv \
-               ${COVERAGE_DIR}/nvdla_coverage_pkg.sv \
                ${TRACE_GEN_RES_DIR}/nvdla_resource_pkg.sv \
+               ${COVERAGE_DIR}/nvdla_coverage_pkg.sv \
                ${TRACE_GEN_SCE_DIR}/nvdla_scenario_pkg.sv \
                ${TRACE_GEN_ENV_DIR}/nvdla_tg_common.svh \
                ${TRACE_GEN_ENV_DIR}/nvdla_tg_core.sv \
                ${TRACE_GEN_ENV_DIR}/nvdla_tg_base_test.sv \
                ${TRACE_GEN_ENV_DIR}/nvdla_tg_top.sv \
-               ${TEST_DIR}/nvdla_test_suite.sv
+               ${TEST_DIR}/nvdla_test_suite.sv 
 
 TB_FILES    := \
                ${VIP_MEM_MAN_DIR}/mem_man_pkg.sv \
-               ${VIP_SURFACE_GEN_DIR}/surface_generator_pkg.sv
+               ${VIP_SURFACE_GEN_DIR}/surface_generator_pkg.sv 
 
 TB_FILES  += ${subst ${TOT},${TOT}/${OUTDIR}/${PROJECT},${VERIF_FILES}}
 
@@ -95,6 +96,8 @@ VERIF_DIRS  :=  \
 				+incdir+${TRACE_GEN_RES_DIR} \
 				+incdir+${TEST_DIR} \
 				+incdir+${COVERAGE_DIR} \
+                +incdir+${TOT}/spec/defs \
+                +incdir+${UVM_DIR}/src
 
 COMMON_DIRS  := \
                 ${subst ${TOT},${TOT}/${OUTDIR}/${PROJECT},${VERIF_DIRS}} 
@@ -120,6 +123,14 @@ VCS_ARGS    := ${COMMON_DIRS} \
                +vcsd \
                -P ${VERDI_HOME}/share/PLI/VCS/LINUX64/novas.tab 
 
+MTI_ARGS    := ${COMMON_DIRS} \
+               -sv \
+               -timescale=1ns/1ns \
+               -64 \
+               +libext+.vlib+.v+.sv+.svh \
+               ${MTI_OK_WARNINGS} \
+               -modelsimini ${TOT}/modelsim.ini
+
 # add 'COVERAGE := 1' in tree.make
 ifeq (${COVERAGE},1)
 VCS_ARGS += -cm line+tgl+cond+fsm+branch+assert
@@ -143,11 +154,21 @@ VERDI_ARGS  := ${COMMON_DIRS} \
 
 default: build
 
+ifeq ($(SIM_PLATFORM),vcs)
 build: vcs_build
+endif
+
+ifeq ($(SIM_PLATFORM),mti)
+build: mti_build
+endif
 
 vcs_build: ${DEFS_FILE}  ${VERIF_DST_FILES}
 	${MKDIRP} ${OUT_DIR}
 	$(VCS_HOME)/bin/vcs ${VCS_ARGS} ${DEFS_FILE} ${DPI_FILES} ${TB_FILES} -l ${COMPILELOG} -o ${VCS_EXE} -Mdir=${OUT_DIR}csrc
+
+mti_build: ${DEFS_FILE}  ${VERIF_DST_FILES}
+	${MKDIRP} ${OUT_DIR} && cd ${OUT_DIR} && \
+	$(MTI_HOME)/bin/vlog ${MTI_ARGS} ${DEFS_FILE} ${DPI_FILES} ${TB_FILES} -dpicpppath /usr/bin/g++
 
 ${VERIF_DST_FILES}: ${DEPTH}/${OUTDIR}/${PROJECT}/% : ${TOT}/%
 	@${MKDIRP} ${dir $@}
@@ -164,7 +185,15 @@ clean: clear
 clear:
 	${RM}  *.log *.dat DVEfiles simv* urgReport *.prof vc_hdrs.h ucli.key *.fsdb novas* verdiLog AN.DB .vlogan*
 
-run:
+ifeq ($(SIM_PLATFORM),vcs)
+run: run_vcs
+endif
+
+ifeq ($(SIM_PLATFORM),mti)
+run: run_mti
+endif
+
+run_vcs:
 	#${VCS_EXE} -l ${SIMLOG} ${SIMV_ARGS} +UVM_VERBOSITY=UVM_HIGH +UVM_TESTNAME=cc_feature_rtest +UVM_VERBOSITY=UVM_LOW +uvm_set_config_int=uvm_test_top,layers,1 +uvm_set_config_string=*,memory_surface_generator_path,${TOT}/verif/tools/surface_generator/surface_generator.py
 	#${VCS_EXE} -l ${SIMLOG} ${SIMV_ARGS} +UVM_VERBOSITY=UVM_HIGH +UVM_TESTNAME=cc_feature_data_full_reuse_rtest +UVM_VERBOSITY=UVM_LOW +uvm_set_config_int=uvm_test_top,layers,2 +uvm_set_config_string=*,memory_surface_generator_path,${TOT}/verif/tools/surface_generator/surface_generator.py
 	#${VCS_EXE} -l ${SIMLOG} ${SIMV_ARGS} +UVM_VERBOSITY=UVM_HIGH +UVM_TESTNAME=cc_feature_weight_full_reuse_rtest +UVM_VERBOSITY=UVM_LOW +uvm_set_config_int=uvm_test_top,layers,2 +uvm_set_config_string=*,memory_surface_generator_path,${TOT}/verif/tools/surface_generator/surface_generator.py
@@ -187,3 +216,10 @@ run:
 	#${VCS_EXE} -l ${SIMLOG} ${SIMV_ARGS} +UVM_VERBOSITY=UVM_HIGH +UVM_TESTNAME=sdprdma_sdp_pdp_rtest +UVM_VERBOSITY=UVM_LOW +uvm_set_config_int=uvm_test_top,layers,1 +uvm_set_config_string=*,memory_surface_generator_path,${TOT}/verif/tools/surface_generator/surface_generator.py
 	#${VCS_EXE} -l ${SIMLOG} ${SIMV_ARGS} +UVM_VERBOSITY=UVM_HIGH +UVM_TESTNAME=multi_scenario_rtest +UVM_VERBOSITY=UVM_LOW +uvm_set_config_int=uvm_test_top,layers,1 +uvm_set_config_string=*,memory_surface_generator_path,${TOT}/verif/tools/surface_generator/surface_generator.py
 
+run_mti:
+	cd ${OUT_DIR} && export LIBRARY_PATH='/tools/model/qs10.4b/questasim/linux_x86_64:/usr/lib/x86_64-linux-gnu' && \
+        export PATH='${PATH}:${TOT}/verif/tools/surface_generator' && \
+        vsim -64 nvdla_tg_top -dpicpppath /usr/bin/g++ \
+        -modelsimini ${TOT}/modelsim.ini +nowarn3691 +nowarn3764 -c +UVM_VERBOSITY=UVM_HIGH +UVM_CONFIG_DB_TRACE \
+        -permit_unmatched_virtual_intf \
+        +uvm_set_config_string=*,memory_surface_generator_path,${TOT}/verif/tools/surface_generator/surface_generator.py

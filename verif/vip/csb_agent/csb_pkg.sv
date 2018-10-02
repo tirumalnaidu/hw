@@ -12,6 +12,8 @@
 `include "csb_interface.sv"
 package csb_pkg;
     import uvm_pkg::*;
+   `include "uvm_macros.svh"
+   
     import nvdla_ral_pkg::*;
     
     `include "csb_defines.svh"

@@ -44,214 +44,7 @@ class scoreboard_checker extends uvm_component;
 
 endclass : scoreboard_checker
 
-typedef class scoreboard_template;
-
-//-------------------------------------------------------------------------------------
-//
-// CLASS: nvdla_tb_scoreboard_container
-//
-// @description
-//-------------------------------------------------------------------------------------
-
-class nvdla_tb_scoreboard_container extends uvm_scoreboard;
-
-    string                         tID;
-
-    //:| global project
-    //:| import project
-    //:| global dma_ports
-    //:| dma_ports = ["cdma_wt", "cdma_dat", "sdp"]
-    //:| if "NVDLA_SDP_BS_ENABLE" in project.PROJVAR: dma_ports.append("sdp_b")
-    //:| if "NVDLA_SDP_BN_ENABLE" in project.PROJVAR: dma_ports.append("sdp_n")
-    //:| if "NVDLA_SDP_EW_ENABLE" in project.PROJVAR: dma_ports.append("sdp_e")
-    //:| if "NVDLA_PDP_ENABLE"    in project.PROJVAR: dma_ports.append("pdp")
-    //:| if "NVDLA_CDP_ENABLE"    in project.PROJVAR: dma_ports.append("cdp")
-    //:| if "NVDLA_BDMA_ENABLE"   in project.PROJVAR: dma_ports.append("bdma")
-    //:| if "NVDLA_RUBIK_ENABLE"  in project.PROJVAR: dma_ports.append("rbk")
-    //:| for dma in dma_ports: print("    scoreboard_template#(dma_txn)   %0s_pri_mem_sb;" % dma)
-    //:| if "NVDLA_SECONDARY_MEMIF_ENABLE" in project.PROJVAR:
-    //:|     for dma in dma_ports: print("    scoreboard_template#(dma_txn)   %0s_sec_mem_sb;" % dma)
-
-    scoreboard_template#(cc_txn#(CSC_DT_DW,CSC_DT_DS))    csc_dat_a_sb;
-    scoreboard_template#(cc_txn#(CSC_WT_DW,CSC_WT_DS))    csc_wt_a_sb;
-    scoreboard_template#(cc_txn#(CSC_DT_DW,CSC_DT_DS))    csc_dat_b_sb;
-    scoreboard_template#(cc_txn#(CSC_WT_DW,CSC_WT_DS))    csc_wt_b_sb;
-    scoreboard_template#(cc_txn#(CMAC_DW,CMAC_DS))        cmac_a_sb;
-    scoreboard_template#(cc_txn#(CMAC_DW,CMAC_DS))        cmac_b_sb;
-    scoreboard_template#(dp_txn#(CACC_DW,CACC_DS))        cacc_sb;
-    scoreboard_template#(dp_txn#(SDP_DW,SDP_DS))          sdp_sb;
-
-    //scoreboard_template#(int)      intr_sb;
-    scoreboard_template#(uvm_tlm_gp)   pri_mem_sb;
-    `ifdef NVDLA_SECONDARY_MEMIF_ENABLE
-    scoreboard_template#(uvm_tlm_gp)   sec_mem_sb;
-    `endif
-
-    //----------------------------------------------------------CONFIGURATION PARAMETERS
-    // NVDLA_TB_SCOREBOARD Configuration Parameters. These parameters can be controlled through
-    // the UVM configuration database
-    // @{
-
-    // }@
-
-    `uvm_component_utils_begin(nvdla_tb_scoreboard_container)
-    `uvm_component_utils_end
-
-    extern function new(string name = "nvdla_tb_scoreboard_container", uvm_component parent = null);
-
-    //------------------------------------------------------------------------UVM Phases
-    // Not all phases are needed, just enable specific phases for different component
-    // @{
-
-    extern function void build_phase(uvm_phase phase);
-    extern function void connect_phase(uvm_phase phase);
-    extern function void end_of_elaboration_phase(uvm_phase phase);
-    extern function void start_of_simulation_phase(uvm_phase phase);
-    extern task          run_phase(uvm_phase phase);
-    extern task          reset_phase(uvm_phase phase);
-    extern task          configure_phase(uvm_phase phase);
-    extern task          main_phase(uvm_phase phase);
-    extern task          shutdown_phase(uvm_phase phase);
-    extern function void extract_phase(uvm_phase phase);
-    extern function void check_phase(uvm_phase phase);
-    extern function void report_phase(uvm_phase phase);
-    extern function void final_phase(uvm_phase phase);
-
-    // }@
-
-endclass : nvdla_tb_scoreboard_container
-
-// Function: new
-// Creates a new nvdla_tb_scoreboard_container component
-function nvdla_tb_scoreboard_container::new(string name = "nvdla_tb_scoreboard_container", uvm_component parent = null);
-    super.new(name, parent);
-    tID = get_type_name().toupper();
-endfunction : new
-
-// Function: build_phase
-// Used to construct testbench components, build top-level testbench topology
-function void nvdla_tb_scoreboard_container::build_phase(uvm_phase phase);
-    super.build_phase(phase);
-    `uvm_info(tID, $sformatf("build_phase begin ..."), UVM_HIGH)
-
-    //:| for dma in dma_ports:
-    //:|     temp = dma + "_pri_mem_sb"
-    //:|     print("    %-18s = scoreboard_template#(dma_txn)::type_id::create(\"%0s_pri_mem_sb\", this);" % (temp, dma))
-    //:| if "NVDLA_SECONDARY_MEMIF_ENABLE" in project.PROJVAR:
-    //:|     for dma in dma_ports:
-    //:|         temp = dma + "_sec_mem_sb"
-    //:|         print("    %-18s = scoreboard_template#(dma_txn)::type_id::create(\"%0s_sec_mem_sb\", this);" % (temp, dma))
-
-    csc_dat_a_sb   = scoreboard_template#(cc_txn#(CSC_DT_DW,CSC_DT_DS))::type_id::create("csc_dat_a_sb", this);
-    csc_wt_a_sb    = scoreboard_template#(cc_txn#(CSC_WT_DW,CSC_WT_DS))::type_id::create("csc_wt_a_sb",  this);
-    csc_dat_b_sb   = scoreboard_template#(cc_txn#(CSC_DT_DW,CSC_DT_DS))::type_id::create("csc_dat_b_sb", this);
-    csc_wt_b_sb    = scoreboard_template#(cc_txn#(CSC_WT_DW,CSC_WT_DS))::type_id::create("csc_wt_b_sb",  this);
-    cmac_a_sb      = scoreboard_template#(cc_txn#(CMAC_DW,CMAC_DS))::type_id::create("cmac_a_sb",   this);
-    cmac_b_sb      = scoreboard_template#(cc_txn#(CMAC_DW,CMAC_DS))::type_id::create("cmac_b_sb",   this);
-    cacc_sb        = scoreboard_template#(dp_txn#(CACC_DW,CACC_DS))::type_id::create("cacc_sb",      this);
-    sdp_sb         = scoreboard_template#(dp_txn#(SDP_DW,SDP_DS))::type_id::create("sdp_sb",     this);
-
-    pri_mem_sb   = scoreboard_template#(uvm_tlm_gp)::type_id::create("pri_mem_sb",  this);
-    `ifdef NVDLA_SECONDARY_MEMIF_ENABLE
-    sec_mem_sb   = scoreboard_template#(uvm_tlm_gp)::type_id::create("sec_mem_sb",  this);
-    `endif
-endfunction : build_phase
-
-// Function: connect_phase
-// Used to connect components/tlm ports for environment topoloty
-function void nvdla_tb_scoreboard_container::connect_phase(uvm_phase phase);
-    super.connect_phase(phase);
-    `uvm_info(tID, $sformatf("connect_phase begin ..."), UVM_HIGH)
-
-endfunction : connect_phase
-
-// Function: end_of_elaboration_phase
-// Used to make any final adjustments to the env topology
-function void nvdla_tb_scoreboard_container::end_of_elaboration_phase(uvm_phase phase);
-    super.end_of_elaboration_phase(phase);
-    `uvm_info(tID, $sformatf("end_of_elaboration_phase begin ..."), UVM_HIGH)
-
-endfunction : end_of_elaboration_phase
-
-// Function: start_of_simulation_phase
-// Used to configure verification componets, printing
-function void nvdla_tb_scoreboard_container::start_of_simulation_phase(uvm_phase phase);
-    super.start_of_simulation_phase(phase);
-    `uvm_info(tID, $sformatf("start_of_simulation_phase begin ..."), UVM_HIGH)
-
-endfunction : start_of_simulation_phase
-
-// TASK: run_phase
-// Used to execute run-time tasks of simulation
-task nvdla_tb_scoreboard_container::run_phase(uvm_phase phase);
-    super.run_phase(phase);
-    `uvm_info(tID, $sformatf("run_phase begin ..."), UVM_HIGH)
-
-endtask : run_phase
-
-// TASK: reset_phase
-// The reset phase is reserved for DUT or interface specific reset behavior
-task nvdla_tb_scoreboard_container::reset_phase(uvm_phase phase);
-    super.reset_phase(phase);
-    `uvm_info(tID, $sformatf("reset_phase begin ..."), UVM_HIGH)
-
-endtask : reset_phase
-
-// TASK: configure_phase
-// Used to program the DUT or memoried in the testbench
-task nvdla_tb_scoreboard_container::configure_phase(uvm_phase phase);
-    super.configure_phase(phase);
-    `uvm_info(tID, $sformatf("configure_phase begin ..."), UVM_HIGH)
-
-endtask : configure_phase
-
-// TASK: main_phase
-// Used to execure mainly run-time tasks of simulation
-task nvdla_tb_scoreboard_container::main_phase(uvm_phase phase);
-    super.main_phase(phase);
-    `uvm_info(tID, $sformatf("main_phase begin ..."), UVM_HIGH)
-
-endtask : main_phase
-
-// TASK: shutdown_phase
-// Data "drain" and other operations for graceful termination
-task nvdla_tb_scoreboard_container::shutdown_phase(uvm_phase phase);
-    super.shutdown_phase(phase);
-    `uvm_info(tID, $sformatf("shutdown_phase begin ..."), UVM_HIGH)
-
-endtask : shutdown_phase
-
-// Function: extract_phase
-// Used to retrieve final state of DUTG and details of scoreboard, etc.
-function void nvdla_tb_scoreboard_container::extract_phase(uvm_phase phase);
-    super.extract_phase(phase);
-    `uvm_info(tID, $sformatf("extract_phase begin ..."), UVM_HIGH)
-
-endfunction : extract_phase
-
-// Function: check_phase
-// Used to process and check the simulation results
-function void nvdla_tb_scoreboard_container::check_phase(uvm_phase phase);
-    super.check_phase(phase);
-    `uvm_info(tID, $sformatf("check_phase begin ..."), UVM_HIGH)
-
-endfunction : check_phase
-
-// Function: report_phase
-// Simulation results analysis and reports
-function void nvdla_tb_scoreboard_container::report_phase(uvm_phase phase);
-    super.report_phase(phase);
-    `uvm_info(tID, $sformatf("report_phase begin ..."), UVM_HIGH)
-
-endfunction : report_phase
-
-// Function: final_phase
-// Used to response/end any outstanding actions of testbench
-function void nvdla_tb_scoreboard_container::final_phase(uvm_phase phase);
-    super.final_phase(phase);
-    `uvm_info(tID, $sformatf("final_phase begin ..."), UVM_HIGH)
-
-endfunction : final_phase
+// typedef class scoreboard_template;
 
 /////////////////////////////////////////////////////////////
 ///
@@ -600,6 +393,213 @@ class scoreboard_template #(type TRANS = int) extends uvm_scoreboard;
     extern function void pre_abort();
 endclass: scoreboard_template
 
+//-------------------------------------------------------------------------------------
+//
+// CLASS: nvdla_tb_scoreboard_container
+//
+// @description
+//-------------------------------------------------------------------------------------
+
+class nvdla_tb_scoreboard_container extends uvm_scoreboard;
+
+    string                         tID;
+
+    //:| global project
+    //:| import project
+    //:| global dma_ports
+    //:| dma_ports = ["cdma_wt", "cdma_dat", "sdp"]
+    //:| if "NVDLA_SDP_BS_ENABLE" in project.PROJVAR: dma_ports.append("sdp_b")
+    //:| if "NVDLA_SDP_BN_ENABLE" in project.PROJVAR: dma_ports.append("sdp_n")
+    //:| if "NVDLA_SDP_EW_ENABLE" in project.PROJVAR: dma_ports.append("sdp_e")
+    //:| if "NVDLA_PDP_ENABLE"    in project.PROJVAR: dma_ports.append("pdp")
+    //:| if "NVDLA_CDP_ENABLE"    in project.PROJVAR: dma_ports.append("cdp")
+    //:| if "NVDLA_BDMA_ENABLE"   in project.PROJVAR: dma_ports.append("bdma")
+    //:| if "NVDLA_RUBIK_ENABLE"  in project.PROJVAR: dma_ports.append("rbk")
+    //:| for dma in dma_ports: print("    scoreboard_template#(dma_txn)   %0s_pri_mem_sb;" % dma)
+    //:| if "NVDLA_SECONDARY_MEMIF_ENABLE" in project.PROJVAR:
+    //:|     for dma in dma_ports: print("    scoreboard_template#(dma_txn)   %0s_sec_mem_sb;" % dma)
+
+    scoreboard_template#(cc_txn#(CSC_DT_DW,CSC_DT_DS))    csc_dat_a_sb;
+    scoreboard_template#(cc_txn#(CSC_WT_DW,CSC_WT_DS))    csc_wt_a_sb;
+    scoreboard_template#(cc_txn#(CSC_DT_DW,CSC_DT_DS))    csc_dat_b_sb;
+    scoreboard_template#(cc_txn#(CSC_WT_DW,CSC_WT_DS))    csc_wt_b_sb;
+    scoreboard_template#(cc_txn#(CMAC_DW,CMAC_DS))        cmac_a_sb;
+    scoreboard_template#(cc_txn#(CMAC_DW,CMAC_DS))        cmac_b_sb;
+    scoreboard_template#(dp_txn#(CACC_DW,CACC_DS))        cacc_sb;
+    scoreboard_template#(dp_txn#(SDP_DW,SDP_DS))          sdp_sb;
+
+    //scoreboard_template#(int)      intr_sb;
+    scoreboard_template#(uvm_tlm_gp)   pri_mem_sb;
+    `ifdef NVDLA_SECONDARY_MEMIF_ENABLE
+    scoreboard_template#(uvm_tlm_gp)   sec_mem_sb;
+    `endif
+
+    //----------------------------------------------------------CONFIGURATION PARAMETERS
+    // NVDLA_TB_SCOREBOARD Configuration Parameters. These parameters can be controlled through
+    // the UVM configuration database
+    // @{
+
+    // }@
+
+    `uvm_component_utils_begin(nvdla_tb_scoreboard_container)
+    `uvm_component_utils_end
+
+    extern function new(string name = "nvdla_tb_scoreboard_container", uvm_component parent = null);
+
+    //------------------------------------------------------------------------UVM Phases
+    // Not all phases are needed, just enable specific phases for different component
+    // @{
+
+    extern function void build_phase(uvm_phase phase);
+    extern function void connect_phase(uvm_phase phase);
+    extern function void end_of_elaboration_phase(uvm_phase phase);
+    extern function void start_of_simulation_phase(uvm_phase phase);
+    extern task          run_phase(uvm_phase phase);
+    extern task          reset_phase(uvm_phase phase);
+    extern task          configure_phase(uvm_phase phase);
+    extern task          main_phase(uvm_phase phase);
+    extern task          shutdown_phase(uvm_phase phase);
+    extern function void extract_phase(uvm_phase phase);
+    extern function void check_phase(uvm_phase phase);
+    extern function void report_phase(uvm_phase phase);
+    extern function void final_phase(uvm_phase phase);
+
+    // }@
+
+endclass : nvdla_tb_scoreboard_container
+
+// Function: new
+// Creates a new nvdla_tb_scoreboard_container component
+function nvdla_tb_scoreboard_container::new(string name = "nvdla_tb_scoreboard_container", uvm_component parent = null);
+    super.new(name, parent);
+    tID = get_type_name().toupper();
+endfunction : new
+
+// Function: build_phase
+// Used to construct testbench components, build top-level testbench topology
+function void nvdla_tb_scoreboard_container::build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    `uvm_info(tID, $sformatf("build_phase begin ..."), UVM_HIGH)
+
+    //:| for dma in dma_ports:
+    //:|     temp = dma + "_pri_mem_sb"
+    //:|     print("    %-18s = scoreboard_template#(dma_txn)::type_id::create(\"%0s_pri_mem_sb\", this);" % (temp, dma))
+    //:| if "NVDLA_SECONDARY_MEMIF_ENABLE" in project.PROJVAR:
+    //:|     for dma in dma_ports:
+    //:|         temp = dma + "_sec_mem_sb"
+    //:|         print("    %-18s = scoreboard_template#(dma_txn)::type_id::create(\"%0s_sec_mem_sb\", this);" % (temp, dma))
+
+    csc_dat_a_sb   = scoreboard_template#(cc_txn#(CSC_DT_DW,CSC_DT_DS))::type_id::create("csc_dat_a_sb", this);
+    csc_wt_a_sb    = scoreboard_template#(cc_txn#(CSC_WT_DW,CSC_WT_DS))::type_id::create("csc_wt_a_sb",  this);
+    csc_dat_b_sb   = scoreboard_template#(cc_txn#(CSC_DT_DW,CSC_DT_DS))::type_id::create("csc_dat_b_sb", this);
+    csc_wt_b_sb    = scoreboard_template#(cc_txn#(CSC_WT_DW,CSC_WT_DS))::type_id::create("csc_wt_b_sb",  this);
+    cmac_a_sb      = scoreboard_template#(cc_txn#(CMAC_DW,CMAC_DS))::type_id::create("cmac_a_sb",   this);
+    cmac_b_sb      = scoreboard_template#(cc_txn#(CMAC_DW,CMAC_DS))::type_id::create("cmac_b_sb",   this);
+    cacc_sb        = scoreboard_template#(dp_txn#(CACC_DW,CACC_DS))::type_id::create("cacc_sb",      this);
+    sdp_sb         = scoreboard_template#(dp_txn#(SDP_DW,SDP_DS))::type_id::create("sdp_sb",     this);
+
+    pri_mem_sb   = scoreboard_template#(uvm_tlm_gp)::type_id::create("pri_mem_sb",  this);
+    `ifdef NVDLA_SECONDARY_MEMIF_ENABLE
+    sec_mem_sb   = scoreboard_template#(uvm_tlm_gp)::type_id::create("sec_mem_sb",  this);
+    `endif
+endfunction : build_phase
+
+// Function: connect_phase
+// Used to connect components/tlm ports for environment topoloty
+function void nvdla_tb_scoreboard_container::connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    `uvm_info(tID, $sformatf("connect_phase begin ..."), UVM_HIGH)
+
+endfunction : connect_phase
+
+// Function: end_of_elaboration_phase
+// Used to make any final adjustments to the env topology
+function void nvdla_tb_scoreboard_container::end_of_elaboration_phase(uvm_phase phase);
+    super.end_of_elaboration_phase(phase);
+    `uvm_info(tID, $sformatf("end_of_elaboration_phase begin ..."), UVM_HIGH)
+
+endfunction : end_of_elaboration_phase
+
+// Function: start_of_simulation_phase
+// Used to configure verification componets, printing
+function void nvdla_tb_scoreboard_container::start_of_simulation_phase(uvm_phase phase);
+    super.start_of_simulation_phase(phase);
+    `uvm_info(tID, $sformatf("start_of_simulation_phase begin ..."), UVM_HIGH)
+
+endfunction : start_of_simulation_phase
+
+// TASK: run_phase
+// Used to execute run-time tasks of simulation
+task nvdla_tb_scoreboard_container::run_phase(uvm_phase phase);
+    super.run_phase(phase);
+    `uvm_info(tID, $sformatf("run_phase begin ..."), UVM_HIGH)
+
+endtask : run_phase
+
+// TASK: reset_phase
+// The reset phase is reserved for DUT or interface specific reset behavior
+task nvdla_tb_scoreboard_container::reset_phase(uvm_phase phase);
+    super.reset_phase(phase);
+    `uvm_info(tID, $sformatf("reset_phase begin ..."), UVM_HIGH)
+
+endtask : reset_phase
+
+// TASK: configure_phase
+// Used to program the DUT or memoried in the testbench
+task nvdla_tb_scoreboard_container::configure_phase(uvm_phase phase);
+    super.configure_phase(phase);
+    `uvm_info(tID, $sformatf("configure_phase begin ..."), UVM_HIGH)
+
+endtask : configure_phase
+
+// TASK: main_phase
+// Used to execure mainly run-time tasks of simulation
+task nvdla_tb_scoreboard_container::main_phase(uvm_phase phase);
+    super.main_phase(phase);
+    `uvm_info(tID, $sformatf("main_phase begin ..."), UVM_HIGH)
+
+endtask : main_phase
+
+// TASK: shutdown_phase
+// Data "drain" and other operations for graceful termination
+task nvdla_tb_scoreboard_container::shutdown_phase(uvm_phase phase);
+    super.shutdown_phase(phase);
+    `uvm_info(tID, $sformatf("shutdown_phase begin ..."), UVM_HIGH)
+
+endtask : shutdown_phase
+
+// Function: extract_phase
+// Used to retrieve final state of DUTG and details of scoreboard, etc.
+function void nvdla_tb_scoreboard_container::extract_phase(uvm_phase phase);
+    super.extract_phase(phase);
+    `uvm_info(tID, $sformatf("extract_phase begin ..."), UVM_HIGH)
+
+endfunction : extract_phase
+
+// Function: check_phase
+// Used to process and check the simulation results
+function void nvdla_tb_scoreboard_container::check_phase(uvm_phase phase);
+    super.check_phase(phase);
+    `uvm_info(tID, $sformatf("check_phase begin ..."), UVM_HIGH)
+
+endfunction : check_phase
+
+// Function: report_phase
+// Simulation results analysis and reports
+function void nvdla_tb_scoreboard_container::report_phase(uvm_phase phase);
+    super.report_phase(phase);
+    `uvm_info(tID, $sformatf("report_phase begin ..."), UVM_HIGH)
+
+endfunction : report_phase
+
+// Function: final_phase
+// Used to response/end any outstanding actions of testbench
+function void nvdla_tb_scoreboard_container::final_phase(uvm_phase phase);
+    super.final_phase(phase);
+    `uvm_info(tID, $sformatf("final_phase begin ..."), UVM_HIGH)
+
+endfunction : final_phase
+
 /////////////////////////////////////////////////////////////
 ///  task: request_trans_check
 ///  implement request transactions check
@@ -824,10 +824,12 @@ task scoreboard_template::request_trans_check();
                         //automatic int index = k;
                         //automatic int kind  = l;
                         forever begin
-                            if(act_req_txn_q[index][kind].size != 0) begin
+//                            if(act_req_txn_q[index][kind].size != 0) begin //(vlog-2898) A dynamic or automatic var. reference (this) is not allowed here.
                                 TRANS      act_tr;
                                 TRANS      exp_tr;
 
+			   wait (act_req_txn_q[index][kind].size != 0);
+			   
                                 //act_req_key[index][kind].get(1); // Get key, lock this queue
                                 // if ((initial_request_credit_num > 0) && (eot_enable == 1)) begin
                                 if (COMPARE_MODE_RTL_GATING_CMOD == request_compare_mode) begin
@@ -859,10 +861,10 @@ task scoreboard_template::request_trans_check();
                                                                     (pass_req_cnt_q[index][kind]+err_req_cnt_q[index][kind]-1), act_tr.sprint(printer), exp_tr.sprint(printer)))
                                 end
                                 //act_req_key[index][kind].put(1); // put back key, ready for next txn check in this queue
-                            end
-                            else begin
-                                @(act_req_txn_q[index][kind].size());
-                            end
+//                            end
+//                            else begin
+//                                @(act_req_txn_q[index][kind].size());  //(vlog-2898) A dynamic or automatic var. reference (this) is not allowed here.
+//                            end
                         end
                     join_none
                 end
@@ -1062,10 +1064,14 @@ task scoreboard_template::response_trans_check();
                         //automatic int index = k;
                         //automatic int kind  = l;
                         forever begin
-                            if(act_txn_q[index][kind].size != 0) begin
+			   // (vlog-2898) A dynamic or automatic var. reference (this) is not allowed here.
+                           // if(act_txn_q[index][kind].size != 0) begin
+			   
                                 TRANS      act_tr;
                                 TRANS      exp_tr;
 
+			   wait (act_txn_q[index][kind].size != 0);
+			   
                                 //act_key[index][kind].get(1); // Get key, lock this queue
                                 // if ((initial_response_credit_num > 0) && (eot_enable == 1)) begin
                                 if (COMPARE_MODE_RTL_GATING_CMOD == response_compare_mode) begin
@@ -1098,10 +1104,10 @@ task scoreboard_template::response_trans_check();
                                                                     (pass_cnt_q[index][kind] + err_cnt_q[index][kind]-1), act_tr.sprint(printer), exp_tr.sprint(printer)))
                                 end
                                 //act_key[index][kind].put(1); // put back key, ready for next txn check in this queue
-                            end
-                            else begin
-                                @(act_txn_q[index][kind].size());
-                            end
+//                            end
+//                            else begin
+//                                @(act_txn_q[index][kind].size()); //(vlog-2898) A dynamic or automatic var. reference (this) is not allowed here.
+//                            end
                         end
                     join_none
                 end

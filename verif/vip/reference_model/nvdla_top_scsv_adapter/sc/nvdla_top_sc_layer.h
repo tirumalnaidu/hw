@@ -30,7 +30,7 @@ class nvdla_top_sc_layer : public sc_module
   //////////////////////////////////////////////
     
   sc_out<bool > nvdla_top_sc2sv_nvdla_intr;  
-#ifndef __EDG__
+#if (!defined(__EDG__) || defined(MTI_SYSTEMC))
 
   //////////////////////////////////////////////
   //nvdla_top SystemC Model TLM Socket list
