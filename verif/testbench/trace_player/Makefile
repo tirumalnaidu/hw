@@ -485,11 +485,25 @@ ln_gcc:
 	cd $(TOT)/$(OUTDIR)/${PROJECT}/verif/testbench/trace_player/work/_sc ; \
 	ln -s -f linux_x86_64_gcc-4.7.4 linux_x86_64_gcc-4.9.2
 
-run_mti:	ln_gcc
+vopt_mti: ln_gcc
+	cd ${OUT_DIR} ; \
+	export LIBRARY_PATH='/tools/model/qs10.4b/questasim/linux_x86_64:/usr/lib/x86_64-linux-gnu' && \
+	vopt -64 -cpppath /usr/bin/g++ -modelsimini ${TOT}/modelsim.ini nvdla_tb_top -o nvdla_tb_top_opt
+
+run_mti_novopt: ln_gcc
 		cd ${OUT_DIR} ; \
 		export LIBRARY_PATH='/tools/model/qs10.4b/questasim/linux_x86_64:/usr/lib/x86_64-linux-gnu' && \
 		vsim -64 nvdla_tb_top -ldflags "-L/usr/lib/x86_64-linux-gnu" -cpppath /usr/bin/g++ \
 		-novopt -modelsimini ${TOT}/modelsim.ini +nowarn3691 +nowarn3764 -c +UVM_VERBOSITY=UVM_HIGH +UVM_CONFIG_DB_TRACE -permit_unmatched_virtual_intf \
+		+uvm_set_config_int=*,auto_dump_surface,1 \
+		+uvm_set_config_string=*,trace_file_path,${TOT}/verif/tests/trace_tests/${PROJECT}/cdp_1x1x1_lrn3_int8_0/cdp_1x1x1_lrn3_int8_0.cfg \
+		+uvm_set_config_string=*,parser_core_path,${TOT}/verif/tools/nvdla_trace_parser.py
+
+run_mti_vopt:	vopt_mti
+		cd ${OUT_DIR} ; \
+		export LIBRARY_PATH='/tools/model/qs10.4b/questasim/linux_x86_64:/usr/lib/x86_64-linux-gnu' && \
+		vsim -64 nvdla_tb_top_opt -ldflags "-L/usr/lib/x86_64-linux-gnu" -cpppath /usr/bin/g++ \
+		-modelsimini ${TOT}/modelsim.ini +nowarn3691 +nowarn3764 -c +UVM_VERBOSITY=UVM_HIGH +UVM_CONFIG_DB_TRACE -permit_unmatched_virtual_intf \
 		+uvm_set_config_int=*,auto_dump_surface,1 \
 		+uvm_set_config_string=*,trace_file_path,${TOT}/verif/tests/trace_tests/${PROJECT}/cdp_1x1x1_lrn3_int8_0/cdp_1x1x1_lrn3_int8_0.cfg \
 		+uvm_set_config_string=*,parser_core_path,${TOT}/verif/tools/nvdla_trace_parser.py
@@ -499,7 +513,9 @@ run:	run_vcs
 endif
 
 ifeq ($(SIM_PLATFORM),mti)
-run:	run_mti
+run:	run_mti_vopt
+#If needed, novopt target available:
+#run:    run_mti_novopt
 endif
 
 ifeq ($(SIM_PLATFORM),vcs)
