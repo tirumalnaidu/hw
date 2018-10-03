@@ -1,6 +1,8 @@
 `ifndef _SURFACE_GENERATOR_SV_
 `define _SURFACE_GENERATOR_SV_
 
+import "DPI-C" function string getenv(input string env_name);
+   
 //-------------------------------------------------------------------------------------
 //
 // CLASS: nvdla_tg_surface_generator
@@ -30,7 +32,7 @@ class surface_generator extends uvm_component;
 endclass : surface_generator
 
 function void surface_generator::generate_memory_surface_feature(surface_feature_config feature_config);
-    string cmd = $sformatf("%s feature --seed %d --width %d --height %d --channel %d --batch %d --component %d --atomic_memory %d --line_stride %d --surface_stride %d --batch_stride %d --data_type %s --pattern %s --file_name %s", memory_surface_generator_path, $urandom(),
+    string cmd = $sformatf("%s %s feature --seed %d --width %d --height %d --channel %d --batch %d --component %d --atomic_memory %d --line_stride %d --surface_stride %d --batch_stride %d --data_type %s --pattern %s --file_name %s", getenv("PYTHON"), memory_surface_generator_path, $urandom(),
         feature_config.width, feature_config.height,feature_config.channel, feature_config.batch,
         feature_config.component_per_element,
         feature_config.atomic_memory,
@@ -50,7 +52,7 @@ endfunction : generate_memory_surface_feature
 
 function void surface_generator::generate_memory_surface_weight(surface_weight_config weight_config);
     // width, height, channel, kernel_number, atomic_channel, atomic_kernel, data_type, alignment_in_byte, pattern, is_compressed, file_name
-    string cmd = $sformatf("%s weight --seed %d --width %d --height %d --channel %d --kernel %d --atomic_channel %d --atomic_kernel %d --data_type %s --alignment_in_byte %d --pattern %s --is_compressed %s --file_name %s", memory_surface_generator_path, $urandom(),
+    string cmd = $sformatf("%s %s weight --seed %d --width %d --height %d --channel %d --kernel %d --atomic_channel %d --atomic_kernel %d --data_type %s --alignment_in_byte %d --pattern %s --is_compressed %s --file_name %s", getenv("PYTHON"), memory_surface_generator_path, $urandom(),
         weight_config.width, weight_config.height,weight_config.channel, weight_config.kernel,
         weight_config.atomic_channel,
         weight_config.atomic_kernel,
@@ -69,7 +71,7 @@ function void surface_generator::generate_memory_surface_weight(surface_weight_c
 endfunction : generate_memory_surface_weight
 
 function void surface_generator::generate_memory_surface_image_pitch(surface_image_pitch_config image_config);
-    string cmd = $sformatf("%0s image_pitch --seed %0d --width %0d --height %0d --channel %0d --atomic_memory %0d --line_stride %0d,%0d --offset_x %0d --pixel_format_name %0s --data_type %0s --pattern %0s --file_name %0s", memory_surface_generator_path, $urandom(),
+    string cmd = $sformatf("%s %0s image_pitch --seed %0d --width %0d --height %0d --channel %0d --atomic_memory %0d --line_stride %0d,%0d --offset_x %0d --pixel_format_name %0s --data_type %0s --pattern %0s --file_name %0s", getenv("PYTHON"), memory_surface_generator_path, $urandom(),
         image_config.width, image_config.height,image_config.channel,
         image_config.atomic_memory,
         image_config.line_stride_0, image_config.line_stride_1,
