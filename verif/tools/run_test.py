@@ -63,6 +63,12 @@ class RunTest(object):
         return os.path.abspath(self._get_ref_path_to_tree_root())
 
     def setup_environment(self):
+        if os.environ['SIM_PLATFORM'] == "vcs":
+            self.setup_environment_vcs()
+        if os.environ['SIM_PLATFORM'] == "mti":
+            self.setup_environment_mti()
+
+    def setup_environment_vcs(self):
         p = re.compile('^\s*(?P<tool_name>\w+)\s*:=\s*(?P<tool_path>.+)\s*$')
         # Get tree.make
         tree_make_abs_path = os.path.join(self._get_abs_path_to_tree_root(), 'tree.make')
@@ -81,6 +87,28 @@ class RunTest(object):
             os.environ["NOVAS_HOME"] = tool['NOVAS_HOME']
             os.environ["VCS_HOME"]   = tool['VCS_HOME']
             self._vcs_lib_path = os.path.join(tool['VCS_HOME'], 'linux64/lib')
+        except KeyError as error:
+            raise Exception("%s is not defined in tree.make" % error.args[0])
+
+    def setup_environment_mti(self):
+        p = re.compile('^\s*(?P<tool_name>\w+)\s*:=\s*(?P<tool_path>.+)\s*$')
+        # Get tree.make
+        tree_make_abs_path = os.path.join(self._get_abs_path_to_tree_root(), 'tree.make')
+        with open(tree_make_abs_path, 'r') as f:
+            tree_make_content = f.readlines()
+        #print(tree_make_content)
+        # Get tool directories
+        tool = dict()
+        for line in tree_make_content:
+            m = p.match(line)
+            if m:
+                tool[m.group('tool_name')] = m.group('tool_path')
+        # Set system env
+        try:
+            #os.environ["VERDI_HOME"] = tool['VERDI_HOME']
+            #os.environ["NOVAS_HOME"] = tool['NOVAS_HOME']
+            os.environ["MTI_HOME"]   = tool['MTI_HOME']
+            self._mti_lib_path = os.path.join(tool['MTI_HOME'], 'lib')
         except KeyError as error:
             raise Exception("%s is not defined in tree.make" % error.args[0])
 
@@ -176,6 +204,12 @@ class RunTest(object):
             raise Exception("RunTest::_trace_test_pre_process", "Fail to copy trace test from original place to current working directory.")
 
     def _uvm_test_pre_process(self):
+        if os.environ['SIM_PLATFORM'] == "vcs":
+            self._uvm_test_pre_process_vcs()
+        if os.environ['SIM_PLATFORM'] == "mti":
+            self._uvm_test_pre_process_mti()
+
+    def _uvm_test_pre_process_vcs(self):
         original_osenv_run_path = os.environ.get('PATH',"")
         stored_dir = os.getcwd()
         dst_test_dir_path = os.path.join(self._output_dir, self._name)
@@ -206,6 +240,63 @@ class RunTest(object):
         cmd_fh.close()
         subprocess.call('chmod 755 '+script, shell=True)
         print("Start dumping trace file './%s/%s.cfg':\n  cmd = %s" % (self._name, self._name, simv_cmd))
+        # run trace dumper
+        try:
+            subprocess.call(script, shell=True)
+        except OSError:
+            raise Exception('RunTest::_uvm_test_pre_prcess', 'Failed to generate trace file')
+        # check result
+        self.run_post_process('./testout', quiet=0)
+        if self._status != Status.PASS:
+            os.chdir(self._output_dir)
+            shutil.copyfile(os.path.join(dst_test_dir_path, 'testout'), os.path.join(self._output_dir,self._output_log))
+            self.remove_status_file()
+            with open('FAIL','w') as f_fh:
+                f_fh.write('Trace Generator Failed')
+            with open('STATUS','w') as status_fh:
+                status_fh.write('FAIL')
+            raise Exception('RunTest::_uvm_test_pre_prcess', 'Failed to generate trace file')
+        os.chdir(stored_dir)
+
+    def _uvm_test_pre_process_mti(self):
+        original_osenv_run_path = os.environ.get('PATH',"")
+        stored_dir = os.getcwd()
+        dst_test_dir_path = os.path.join(self._output_dir, self._name)
+        if os.path.isdir(dst_test_dir_path):
+            shutil.rmtree(dst_test_dir_path)
+        os.mkdir(dst_test_dir_path)
+        os.chdir(dst_test_dir_path)
+
+        self.create_status_file()
+
+        # Dump trace file under trace_generator TB
+        vsim_exe = os.path.join('vsim')
+        if shutil.which(vsim_exe) is False:
+            raise Exception('RunTest::_uvm_test_pre_process', 'vsim %s can not be found by which, missing PATH ?' % vsim_exe)
+        vsim_args = ' -l testout +UVM_TESTNAME=%s ' % (self._name)
+        if self._rtlarg is not None:
+            vsim_args += ' ' + ' '.join(self._rtlarg)
+        vsim_args += ' -64'
+        vsim_args += ' ' + os.path.join(self._tree_root, 'outdir', self._project, __uvm_tg_path__, 'work') + '.' + 'nvdla_tg_top'
+        vsim_args += ' -dpicpppath /usr/bin/g++'
+        vsim_args += ' -modelsimini' + ' ' + os.environ['TOT'] + '/modelsim.ini'
+        vsim_args += ' +nowarn3691 +nowarn3764 -c +UVM_VERBOSITY=UVM_HIGH +UVM_CONFIG_DB_TRACE -permit_unmatched_virtual_intf'
+        vsim_args += ' +uvm_set_config_string=*,memory_surface_generator_path,${TOT}/verif/tools/surface_generator/surface_generator.py'
+        vsim_args += ' ' + '-do "run -all ; quit"'
+        vsim_cmd  = vsim_exe + vsim_args
+        added_run_path = os.path.join(self._tree_root, 'verif/tools/surface_generator')
+        os.environ['PATH'] = os.pathsep.join([added_run_path, original_osenv_run_path])
+        # generate trace dumper script
+        script = './run_trace_generator.sh'
+        cmd_fh = open(script, '+w')
+        cmd_fh.write('#!/bin/sh\n\n')
+        cmd_fh.write("export PYTHON=%s\n\n" % os.environ['PYTHON'])
+        cmd_fh.write("export MTI_HOME=%s\n\n" % os.environ['MTI_HOME'])
+        cmd_fh.write("export PATH=%s\n\n" % os.environ['PATH'])
+        cmd_fh.write(vsim_cmd+'\n')
+        cmd_fh.close()
+        subprocess.call('chmod 755 '+script, shell=True)
+        print("Start dumping trace file './%s/%s.cfg':\n  cmd = %s" % (self._name, self._name, vsim_cmd))
         # run trace dumper
         try:
             subprocess.call(script, shell=True)
@@ -257,6 +348,12 @@ class RunTest(object):
             raise Exception('RunTest::run_simulation', msg)
 
     def run_uvm_tb_simulation(self):
+        if os.environ['SIM_PLATFORM'] == "vcs":
+            self.run_uvm_tb_simulation_vcs()
+        if os.environ['SIM_PLATFORM'] == "mti":
+            self.run_uvm_tb_simulation_mti()
+        
+    def run_uvm_tb_simulation_vcs(self):
         # set environment variable
         original_osenv_ld_path = os.environ.get('LD_LIBRARY_PATH',"")
         original_osenv_run_path = os.environ.get('PATH',"")
@@ -318,7 +415,78 @@ class RunTest(object):
         # restore environment variable
         os.environ['LD_LIBRARY_PATH'] = original_osenv_ld_path
         os.environ['PATH'] = original_osenv_run_path
-    
+
+    def run_uvm_tb_simulation_mti(self):
+        # set environment variable
+        original_osenv_ld_path = os.environ.get('LD_LIBRARY_PATH',"")
+        original_osenv_run_path = os.environ.get('PATH',"")
+        added_ld_path1 = os.path.join(self._tree_root, 'outdir', self._project, __cmod_wrap_lib_path__)
+        added_ld_path2 = self._mti_lib_path
+        added_run_path = os.path.join(self._tree_root, 'verif/tools')
+        os.environ['LD_LIBRARY_PATH'] = os.pathsep.join([added_ld_path1, added_ld_path2, original_osenv_ld_path])
+        os.environ['PATH'] = os.pathsep.join([added_run_path, original_osenv_run_path])
+
+        # set cmd
+        vsim_exe = os.path.join('vsim')
+        if shutil.which(vsim_exe) is False:
+            raise Exception('RunTest::run_uvm_tb_simulation', 'vsim %s can not be found by which, missing PATH ?' % vsim_exe)
+        vsim_args = ' -l ' + self._output_log
+        if self._dump_waveform:
+            vsim_args += ' +wave'
+        if self._dump_memory:
+            vsim_args += ' +uvm_set_config_int=*,auto_dump_surface,1'
+        if self._config_dict['nvdla_utb_work_mode'] is not None:
+            vsim_args += ' +WORK_MODE=' + self._config_dict['nvdla_utb_work_mode'].upper()
+        vsim_args += ' +UVM_MAX_QUIT_COUNT=1'
+        vsim_args += ' +uvm_set_action=*,UVM/COMP/NAME,UVM_WARNING,UVM_NO_ACTION'
+        vsim_args += ' +uvm_set_action=*,UVM/RSRC/NOREGEX,UVM_WARNING,UVM_NO_ACTION'
+        vsim_args += ' +uvm_set_config_string=*,trace_file_path,' + self._trace_test_cfg_path
+        if self._rtlarg is not None:
+            vsim_args += ' ' + ' '.join(self._rtlarg)
+        vsim_args += ' -64'
+        vsim_args += ' ' + os.path.join(self._tree_root, 'outdir', self._project, __uvm_tp_path__, 'work') + '.' + 'nvdla_tb_top'
+        vsim_args += ' -ldflags "-L/usr/lib/x86_64-linux-gnu"'
+        vsim_args += ' -cpppath /usr/bin/g++'
+        vsim_args += ' -novopt'
+        vsim_args += ' -modelsimini' + ' ' + os.environ['TOT'] + '/modelsim.ini'
+        vsim_args += ' +nowarn3691 +nowarn3764 -c +UVM_VERBOSITY=UVM_HIGH +UVM_CONFIG_DB_TRACE -permit_unmatched_virtual_intf'
+        vsim_args += ' ' + '-do "run -all ; quit"'
+        vsim_cmd = vsim_exe + vsim_args
+
+        # generate trace player script
+        script = './run_trace_player.sh'
+        cmd_fh = open(script, '+w')
+        cmd_fh.write('#!/bin/sh\n\n')
+        cmd_fh.write("export MTI_HOME=%s\n\n" % os.environ['MTI_HOME'])
+        #cmd_fh.write("export VERDI_HOME=%s\n\n" % os.environ['VERDI_HOME'])
+        #cmd_fh.write("export NOVAS_HOME=%s\n\n" % os.environ['NOVAS_HOME'])
+        cmd_fh.write("export LD_LIBRARY_PATH=%s\n\n" % os.environ['LD_LIBRARY_PATH'])
+        cmd_fh.write("export PATH=%s\n\n" % os.environ['PATH'])
+        cmd_fh.write(vsim_cmd+'\n')
+        cmd_fh.close()
+        subprocess.call('chmod 755 '+script, shell=True)
+
+        # copy run_verdi.sh from outdir to running dir
+        #run_verdi_src_path = os.path.join(os.path.dirname(vsim_exe), 'run_verdi.sh')
+        #shutil.copy(run_verdi_src_path, self._output_dir)
+
+        # run cmd
+        print ("Start running simulation: cmd = %s\n" % script)
+        try:
+            subprocess.run(script, timeout=60*self._timeout, shell=False)
+        except subprocess.TimeoutExpired:
+            msg = "\n** ERROR **: run_test.py: Job timeout after %0d minutes running. Please specify a bigger value through option '-timeout <N>'" % self._timeout
+            with open(self._output_log, 'a') as fh:
+                fh.write(msg)
+            print(msg)
+            self._status = Status.FAILED
+
+        print ("Simulation finished.")
+
+        # restore environment variable
+        os.environ['LD_LIBRARY_PATH'] = original_osenv_ld_path
+        os.environ['PATH'] = original_osenv_run_path
+
     def run_post_process(self, log_fname, quiet=0):
         ## Use for post processing on simulation result, log analysis and etc
         BIG_PASS = '''
@@ -352,13 +520,29 @@ F     A     A  IIIII  LLLLL
 '''
         print ("Parse simulation log ...")
 
-        pass_keywords = ['TEST PASS', 'SIMULATION PASS', 'TRACE GENERATION PASS']
-        fail_keywords = ['error', 'fail', 'fatal']
-        ignore_keywords = ['UVM_ERROR :    0', 'UVM_FATAL :    0', 'Failed to load FSDB dumper',
-                           'Number of demoted UVM_ERROR reports', 'Number of caught UVM_ERROR reports',
-                           'Number of demoted UVM_FATAL reports', 'Number of caught UVM_FATAL reports',
-                           'is_response_error',
-                           ]
+        if os.environ['SIM_PLATFORM'] == "vcs":
+            pass_keywords = ['TEST PASS', 'SIMULATION PASS', 'TRACE GENERATION PASS']
+        if os.environ['SIM_PLATFORM'] == "mti":
+            pass_keywords = ['TEST PASS', 'SIMULATION PASS', 'TRACE GENERATION PASS']
+
+        if os.environ['SIM_PLATFORM'] == "vcs":
+            fail_keywords = ['error', 'fail', 'fatal']
+        if os.environ['SIM_PLATFORM'] == "mti":
+            fail_keywords = ['error', 'fail', 'fatal']
+
+        if os.environ['SIM_PLATFORM'] == "vcs":
+            ignore_keywords = ['UVM_ERROR :    0', 'UVM_FATAL :    0', 'Failed to load FSDB dumper',
+                               'Number of demoted UVM_ERROR reports', 'Number of caught UVM_ERROR reports',
+                               'Number of demoted UVM_FATAL reports', 'Number of caught UVM_FATAL reports',
+                               'is_response_error',
+                               ]
+        if os.environ['SIM_PLATFORM'] == "mti":
+            ignore_keywords = ['UVM_ERROR :    0', 'UVM_FATAL :    0', 'Failed to load FSDB dumper',
+                               'Number of demoted UVM_ERROR reports', 'Number of caught UVM_ERROR reports',
+                               'Number of demoted UVM_FATAL reports', 'Number of caught UVM_FATAL reports',
+                               'is_response_error', 'Errors: 0,'
+                               ]
+            
         pass_pattern = '|'.join(pass_keywords)
         fail_pattern = '|'.join(fail_keywords)
         ignore_pattern = '|'.join(ignore_keywords)

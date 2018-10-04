@@ -12,7 +12,7 @@ export VCS_HOME			 := ${VCS_HOME}
 export NOVAS_HOME		 := ${NOVAS_HOME}
 export PATH              := ${VERDI_HOME}/bin:${VCS_HOME}/bin:${PATH}
 export VCS_ARCH_OVERRIDE := linux
-export PYTHON            := '${PYTHON}'
+export PYTHON            := ${PYTHON}
 
 ## =========================================================================================
 ## Setting command

@@ -3,6 +3,9 @@ DEPTH   := ../..
 -include ${DEPTH}/tree.make
 -include $(TOT)/$(OUTDIR)/$(PROJECT)/spec/defs/project.mk
 OUT_DIR := ${DEPTH}/${OUTDIR}/${PROJECT}/${REL_PATH_FROM_TOT}/
+export SIM_PLATFORM := ${SIM_PLATFORM}
+export TOT := ${TOT}
+export PYTHON := ${PYTHON}
 
 MKDIR	:= /bin/mkdir
 CP		:= /bin/cp
