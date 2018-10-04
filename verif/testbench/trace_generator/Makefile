@@ -76,8 +76,7 @@ VERIF_FILES := \
                ${TRACE_GEN_ENV_DIR}/nvdla_tg_common.svh \
                ${TRACE_GEN_ENV_DIR}/nvdla_tg_core.sv \
                ${TRACE_GEN_ENV_DIR}/nvdla_tg_base_test.sv \
-               ${TRACE_GEN_ENV_DIR}/nvdla_tg_top.sv \
-               ${TEST_DIR}/nvdla_test_suite.sv 
+               ${TRACE_GEN_ENV_DIR}/nvdla_tg_top.sv
 
 TB_FILES    := \
                ${VIP_MEM_MAN_DIR}/mem_man_pkg.sv \
