@@ -440,7 +440,7 @@ build: vcs_build gen_verdi_cmd
 endif
 
 ifeq ($(SIM_PLATFORM),mti)
-build: mti_build
+build: mti_build ln_gcc vopt_mti
 endif
 
 ifeq ($(SIM_PLATFORM),vcs)
@@ -485,12 +485,12 @@ ln_gcc:
 	cd $(TOT)/$(OUTDIR)/${PROJECT}/verif/testbench/trace_player/work/_sc ; \
 	ln -s -f linux_x86_64_gcc-4.7.4 linux_x86_64_gcc-4.9.2
 
-vopt_mti: ln_gcc
+vopt_mti:
 	cd ${OUT_DIR} ; \
 	export LIBRARY_PATH='/tools/model/qs10.4b/questasim/linux_x86_64:/usr/lib/x86_64-linux-gnu' && \
 	vopt -64 -cpppath /usr/bin/g++ -modelsimini ${TOT}/modelsim.ini nvdla_tb_top -o nvdla_tb_top_opt
 
-run_mti_novopt: ln_gcc
+run_mti_novopt:
 		cd ${OUT_DIR} ; \
 		export LIBRARY_PATH='/tools/model/qs10.4b/questasim/linux_x86_64:/usr/lib/x86_64-linux-gnu' && \
 		vsim -64 nvdla_tb_top -ldflags "-L/usr/lib/x86_64-linux-gnu" -cpppath /usr/bin/g++ \
