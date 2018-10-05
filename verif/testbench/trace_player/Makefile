@@ -336,6 +336,9 @@ ifeq (${NVDLA_SAIF_ENABLE},1)
 	VCS_ARGS  += +vcs+saif_libcell +define+NVDLA_SAIF_ENABLE
 endif
 
+ifeq (${WAVES},1)
+WAVES_OPT := +wave
+endif
 
 ## =========================================================================================
 ## SYSTEMC Compiler/Linker setup                                                                                   
@@ -495,6 +498,8 @@ run_mti_novopt:
 		export LIBRARY_PATH='/tools/model/qs10.4b/questasim/linux_x86_64:/usr/lib/x86_64-linux-gnu' && \
 		vsim -64 nvdla_tb_top -ldflags "-L/usr/lib/x86_64-linux-gnu" -cpppath /usr/bin/g++ \
 		-novopt -modelsimini ${TOT}/modelsim.ini +nowarn3691 +nowarn3764 -c +UVM_VERBOSITY=UVM_HIGH +UVM_CONFIG_DB_TRACE -permit_unmatched_virtual_intf \
+		${WAVES_OPT} \
+		-do "run -all; quit" \
 		+uvm_set_config_int=*,auto_dump_surface,1 \
 		+uvm_set_config_string=*,trace_file_path,${TOT}/verif/tests/trace_tests/${PROJECT}/cdp_1x1x1_lrn3_int8_0/cdp_1x1x1_lrn3_int8_0.cfg \
 		+uvm_set_config_string=*,parser_core_path,${TOT}/verif/tools/nvdla_trace_parser.py
@@ -504,6 +509,8 @@ run_mti_vopt:	vopt_mti
 		export LIBRARY_PATH='/tools/model/qs10.4b/questasim/linux_x86_64:/usr/lib/x86_64-linux-gnu' && \
 		vsim -64 nvdla_tb_top_opt -ldflags "-L/usr/lib/x86_64-linux-gnu" -cpppath /usr/bin/g++ \
 		-modelsimini ${TOT}/modelsim.ini +nowarn3691 +nowarn3764 -c +UVM_VERBOSITY=UVM_HIGH +UVM_CONFIG_DB_TRACE -permit_unmatched_virtual_intf \
+		${WAVES_OPT} \
+		-do "run -all; quit" \
 		+uvm_set_config_int=*,auto_dump_surface,1 \
 		+uvm_set_config_string=*,trace_file_path,${TOT}/verif/tests/trace_tests/${PROJECT}/cdp_1x1x1_lrn3_int8_0/cdp_1x1x1_lrn3_int8_0.cfg \
 		+uvm_set_config_string=*,parser_core_path,${TOT}/verif/tools/nvdla_trace_parser.py
