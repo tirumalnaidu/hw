@@ -540,7 +540,7 @@ F     A     A  IIIII  LLLLL
             ignore_keywords = ['UVM_ERROR :    0', 'UVM_FATAL :    0', 'Failed to load FSDB dumper',
                                'Number of demoted UVM_ERROR reports', 'Number of caught UVM_ERROR reports',
                                'Number of demoted UVM_FATAL reports', 'Number of caught UVM_FATAL reports',
-                               'is_response_error', 'Errors: 0,'
+                               'is_response_error', 'Errors: 0,', 'UVM_INFO.*@.*0.00ns:.*reporter.*[CFGDB/GET].*uvm_test_top.*=.*null.*(failed lookup)'
                                ]
             
         pass_pattern = '|'.join(pass_keywords)
