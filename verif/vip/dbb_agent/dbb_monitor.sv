@@ -617,7 +617,8 @@ task dbb_monitor::wr_address_monitor();
 
         txn_id = mon_if.monclk.awid;
         arr_id = 0; 
-        if(wr_q[arr_id] == null) wr_q[arr_id] = new;   // Initialize entry for this ID
+//        if(wr_q[arr_id] == null) wr_q[arr_id] = new;   // Initialize entry for this ID
+        if(wr_q.exists(arr_id) == 0) wr_q[arr_id] = new;   // Initialize entry for this ID
 
         // Check to see if we're tracking write data for this ID already
         // find 1st tracked txn without an address
@@ -743,7 +744,8 @@ task dbb_monitor::wr_data_monitor();
         while ( mon_if.monclk.wvalid !== 1'b1 );
 
         id = 0;
-        if(wr_q[id] == null) wr_q[id] = new;
+        //if(wr_q[id] == null) wr_q[id] = new;
+        if(wr_q.exists(id) == 0) wr_q[id] = new;
 
         // Find first tracked txn which is still waiting for data
         // Can't use this because item is uvm_tlm_gp, not dbb_ctrl_ext
@@ -1015,7 +1017,8 @@ task dbb_monitor::rd_address_monitor();
         tr_helper.pre_send_checks(tr);
         mon_analysis_port_request.write(tr);
 
-        if(rd_q[id] == null) rd_q[id] = new;
+        //if(rd_q[id] == null) rd_q[id] = new;
+        if(rd_q.exists(id) == 0) rd_q[id] = new;
         rd_q[id].q.push_back(tr); // Queue transactions in order per ID
 
 `ifdef CALLBACKS
