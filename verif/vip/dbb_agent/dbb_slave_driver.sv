@@ -2493,6 +2493,9 @@ task automatic dbb_slave_driver::get_new_transaction(ref uvm_tlm_gp tr);
 
     // Store in the active transaction queue. This helps with cleanup in case a reset
     // occurs before the transaction completes on its own.
+    if (active_txn_q.exists(tr) == 0) begin
+       active_txn_q[tr] = 0;
+    end
     active_txn_q[tr]++;
 
     `CAST_DBB_EXT(,tr,helper)
