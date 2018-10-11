@@ -295,6 +295,16 @@ VCS_ARGS    := ${COMMON_DIRS} \
                +vcsd \
 			   -parallel+sva+tgl \
                -P ${VERDI_HOME}/share/PLI/VCS/LINUX64/novas.tab 
+
+
+# add 'COVERAGE := 1' in tree.make
+ifeq (${COVERAGE},1)
+VCS_ARGS += -cm line+tgl+cond+fsm+branch+assert
+VCS_ARGS += -cm_tgl portsonly -cm_cond allops -cm_line contassign
+VCS_ARGS += -cm_libs yv
+VCS_ARGS += -cm_hier ${COVERAGE_DIR}/nvdla.hier
+#VCS_ARGS += -cm_dir simv.cm
+endif
 endif
 
 ifeq ($(SIM_PLATFORM),mti)
@@ -309,15 +319,22 @@ MTI_ARGS    := ${COMMON_DIRS} \
                +define+PRAND_OFF \
                ${MTI_OK_WARNINGS} \
                -modelsimini ${TOT}/modelsim.ini
-endif
 
 # add 'COVERAGE := 1' in tree.make
 ifeq (${COVERAGE},1)
-VCS_ARGS += -cm line+tgl+cond+fsm+branch+assert
-VCS_ARGS += -cm_tgl portsonly -cm_cond allops -cm_line contassign
-VCS_ARGS += -cm_libs yv
-VCS_ARGS += -cm_hier ${COVERAGE_DIR}/nvdla.hier
+#VCS_ARGS += -cm line+tgl+cond+fsm+branch+assert
+#FIXME:::Missing coverage on assertions?
+MTI_ARGS += +cover=stcfe
+#FIXME:::Missing VCS-MTI equivalent switches
+#VCS_ARGS += -cm_tgl portsonly -cm_cond allops -cm_line contassign
+MTI_ARGS += -toggleportsonly 
+#VCS_ARGS += -cm_libs yv
+#VCS_ARGS += -cm_hier ${COVERAGE_DIR}/nvdla.hier
 #VCS_ARGS += -cm_dir simv.cm
+
+VSIM_ARGS   := -coverage \
+               -do "coverage save -onexit top.ucdb"
+endif
 endif
 
 SIMV_ARGS   := +wave \
@@ -499,6 +516,7 @@ run_mti_novopt:
 		vsim -64 nvdla_tb_top -ldflags "-L/usr/lib/x86_64-linux-gnu" -cpppath /usr/bin/g++ \
 		-novopt -modelsimini ${TOT}/modelsim.ini +nowarn3691 +nowarn3764 -c +UVM_VERBOSITY=UVM_HIGH +UVM_CONFIG_DB_TRACE -permit_unmatched_virtual_intf \
 		${WAVES_OPT} \
+		${VSIM_ARGS} \
 		-do "run -all; quit" \
 		+uvm_set_config_int=*,auto_dump_surface,1 \
 		+uvm_set_config_string=*,trace_file_path,${TOT}/verif/tests/trace_tests/${PROJECT}/cdp_1x1x1_lrn3_int8_0/cdp_1x1x1_lrn3_int8_0.cfg \
@@ -510,6 +528,7 @@ run_mti_vopt:	vopt_mti
 		vsim -64 nvdla_tb_top_opt -ldflags "-L/usr/lib/x86_64-linux-gnu" -cpppath /usr/bin/g++ \
 		-modelsimini ${TOT}/modelsim.ini +nowarn3691 +nowarn3764 -c +UVM_VERBOSITY=UVM_HIGH +UVM_CONFIG_DB_TRACE -permit_unmatched_virtual_intf \
 		${WAVES_OPT} \
+		${VSIM_ARGS} \
 		-do "run -all; quit" \
 		+uvm_set_config_int=*,auto_dump_surface,1 \
 		+uvm_set_config_string=*,trace_file_path,${TOT}/verif/tests/trace_tests/${PROJECT}/cdp_1x1x1_lrn3_int8_0/cdp_1x1x1_lrn3_int8_0.cfg \

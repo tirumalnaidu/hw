@@ -138,6 +138,18 @@ VCS_ARGS += -cm_tgl portsonly -cm_cond allops -cm_line contassign
 VCS_ARGS += -cm_libs yv
 VCS_ARGS += -cm_hier ${COVERAGE_DIR}/nvdla.hier
 #VCS_ARGS += -cm_dir simv.cm
+
+#VCS_ARGS += -cm line+tgl+cond+fsm+branch+assert
+#FIXME:::Missing coverage on assertions?
+MTI_ARGS += +cover=stcfe
+#FIXME:::Missing VCS-MTI equivalent switches
+#VCS_ARGS += -cm_tgl portsonly -cm_cond allops -cm_line contassign
+MTI_ARGS += -toggleportsonly
+#VCS_ARGS += -cm_libs yv
+#VCS_ARGS += -cm_hier ${COVERAGE_DIR}/nvdla.hier
+
+VSIM_ARGS       := -coverage \
+                   -do "coverage save -onexit top.ucdb"
 endif
 
 SIMV_ARGS	:= +UVM_OBJECTION_TRACE
@@ -222,4 +234,6 @@ run_mti:
         vsim -64 nvdla_tg_top -dpicpppath /usr/bin/g++ \
         -modelsimini ${TOT}/modelsim.ini +nowarn3691 +nowarn3764 -c +UVM_VERBOSITY=UVM_HIGH +UVM_CONFIG_DB_TRACE \
         -permit_unmatched_virtual_intf \
+	${VSIM_ARGS} \
+	-do "run -all; quit" \
         +uvm_set_config_string=*,memory_surface_generator_path,${TOT}/verif/tools/surface_generator/surface_generator.py
